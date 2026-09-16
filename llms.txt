@@ -1,0 +1,16 @@
+# Prospect
+
+Prospect is building AI-native portfolio intelligence and decision infrastructure for systematic investment teams.
+
+Canonical site: https://prospectpartnership.co.uk/
+
+Core topics:
+- Systematic portfolio management: https://prospectpartnership.co.uk/systematic-portfolio-management/
+- Strategy monitoring: https://prospectpartnership.co.uk/strategy-monitoring/
+- Portfolio risk management: https://prospectpartnership.co.uk/portfolio-risk-management/
+- Capital allocation: https://prospectpartnership.co.uk/capital-allocation/
+- Regime-aware allocation: https://prospectpartnership.co.uk/regime-aware-allocation/
+- AI-native portfolio management: https://prospectpartnership.co.uk/ai-native-portfolio-management/
+- Company: https://prospectpartnership.co.uk/about/
+
+Contact: founder@prospectpartnership.co.uk
