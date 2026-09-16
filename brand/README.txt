@@ -1,0 +1,1 @@
+Prospect brand assets used by the website and structured metadata.
