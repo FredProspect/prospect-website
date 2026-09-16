@@ -1,14 +1,18 @@
-# Prospect Website
+# Prospect
 
-Investor-facing website for Prospect Partnership Ltd.
+[Prospect](https://prospectpartnership.co.uk/) is building AI-native portfolio intelligence and decision infrastructure for systematic investment teams — connecting strategy monitoring, portfolio risk and explainable capital allocation.
 
-- Production domain: `prospectpartnership.co.uk`
-- Hosting target: GitHub Pages
-- Contact: `founder@prospectpartnership.co.uk`
-- Repository owner: FredProspect
+**Website:** https://prospectpartnership.co.uk/
 
-## Deployment
+**Contact:** founder@prospectpartnership.co.uk
 
-Enable GitHub Pages from the `main` branch at the repository root, then attach the custom domain `prospectpartnership.co.uk`. The repository already includes a `CNAME` file for the domain.
+## Research and product topics
 
-The website is a static single-page site with no build step or paid hosting dependency.
+- [Systematic portfolio management](https://prospectpartnership.co.uk/systematic-portfolio-management/)
+- [Systematic strategy monitoring](https://prospectpartnership.co.uk/strategy-monitoring/)
+- [Portfolio risk management](https://prospectpartnership.co.uk/portfolio-risk-management/)
+- [Capital allocation across systematic strategies](https://prospectpartnership.co.uk/capital-allocation/)
+- [Regime-aware portfolio allocation](https://prospectpartnership.co.uk/regime-aware-allocation/)
+- [AI-native portfolio management](https://prospectpartnership.co.uk/ai-native-portfolio-management/)
+
+Prospect Partnership Ltd · Company No. 15277481 · England & Wales.
