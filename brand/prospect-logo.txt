@@ -1,0 +1,1 @@
+The canonical web logo is /brand/prospect-logo.png. SVG source is /brand/prospect-logo.svg.
