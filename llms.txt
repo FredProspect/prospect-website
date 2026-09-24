@@ -1,11 +1,20 @@
 # Prospect
 
-Prospect is building AI-native portfolio intelligence and decision infrastructure for systematic investment teams, including systematic hedge funds, quant teams, asset managers and proprietary trading firms.
+Prospect is building the AI-native intelligence and decision layer between systematic strategies and capital for systematic investment firms.
 
 Canonical site: https://prospectpartnership.co.uk/
 Company: Prospect Partnership Ltd
 Founder: Fred Boxer
 Contact: founder@prospectpartnership.co.uk
+
+Company architecture:
+- Strategy understanding: strategy identity, thesis, family, dependencies and data lineage.
+- Strategy intelligence: strategy-specific evidence, behavioural fingerprints, changing reliability and uncertainty.
+- Regime intelligence: market context and strategy/regime compatibility.
+- Portfolio intelligence: correlation, concentration, common exposures, diversification and cross-strategy interactions.
+- Capital-allocation intelligence: constraint-aware, explainable allocation scenarios for human review.
+
+Strategy reliability and change detection are the first executable capabilities inside the wider Prospect intelligence layer. Prospect is not a generic monitoring platform.
 
 Core topics and canonical pages:
 - Systematic portfolio management: https://prospectpartnership.co.uk/systematic-portfolio-management/
@@ -20,4 +29,4 @@ Core topics and canonical pages:
 - Insights: https://prospectpartnership.co.uk/insights/
 - Company and founder: https://prospectpartnership.co.uk/about/
 
-Prospect is pre-product and building V1. Initial deployments are intended as analytics and decision support; customers retain discretion over capital deployment.
+Prospect is pre-seed and building V1. Initial deployment is institutional decision support; customers retain discretion over capital deployment.
