@@ -9,7 +9,8 @@ const browser = await chromium.launch({ executablePath: '/usr/bin/chromium', arg
 const result = { checkedAt: new Date().toISOString(), phase: process.env.SMOKE_PHASE || 'release', collector: api };
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, colorScheme: 'dark', reducedMotion: 'reduce' });
-  await page.goto(api + '/?utm_source=controlled-release-smoke', { waitUntil: 'networkidle' });
+  const visibleOrigin = process.env.SMOKE_PHASE === 'canonical-publication' ? 'https://prospectpartnership.co.uk' : api;
+  await page.goto(visibleOrigin + '/?utm_source=controlled-release-smoke', { waitUntil: 'networkidle' });
   assert.match(await page.locator('h1').textContent(), /A whole new/);
   await page.locator('.portrait-frame img').scrollIntoViewIfNeeded();
   await page.waitForFunction(() => document.querySelector('.portrait-frame img').complete && document.querySelector('.portrait-frame img').naturalWidth > 0);
@@ -21,6 +22,7 @@ try {
   assert.equal((await saved).status(), 200);
   await page.waitForFunction(() => document.querySelector('#form-status').textContent.startsWith('You’re on the list.'));
   result.collectorUi = 'passed';
+  if (visibleOrigin !== api) result.canonicalUi = 'passed';
   await page.goto('https://prospectpartnership.co.uk/', { waitUntil: 'networkidle' });
   result.canonicalContentUpdated = /A whole new/.test(await page.locator('h1').textContent());
   const cross = await page.evaluate(async endpoint => {
