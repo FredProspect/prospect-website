@@ -7,5 +7,24 @@
     "canonicalContentUpdated": false,
     "canonicalCors": "passed",
     "unapprovedOrigin": "rejected"
+  },
+  {
+    "checkedAt": "2026-11-16T23:46:16.950Z",
+    "phase": "after-container-replacement",
+    "collector": "https://prospect-public-website-staging.up.railway.app",
+    "collectorUi": "passed",
+    "canonicalContentUpdated": false,
+    "canonicalCors": "passed",
+    "unapprovedOrigin": "rejected"
+  },
+  {
+    "checkedAt": "2026-11-16T23:47:58.355Z",
+    "phase": "canonical-publication",
+    "collector": "https://prospect-public-website-staging.up.railway.app",
+    "collectorUi": "passed",
+    "canonicalUi": "passed",
+    "canonicalContentUpdated": true,
+    "canonicalCors": "passed",
+    "unapprovedOrigin": "rejected"
   }
 ]

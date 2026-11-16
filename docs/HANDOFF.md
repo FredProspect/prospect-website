@@ -61,6 +61,16 @@ Repository-sourced destinations remain `mailto:founder@prospectpartnership.co.uk
 - Firefox and WebKit executables remain unavailable; cross-engine validation is explicitly blocked, not passed.
 - Screenshots and an actual browser walkthrough are in `evidence/`; controlled local tests use temporary SQLite databases and example.com addresses. Live release verification is recorded separately below.
 
-## Release verification
+## Release verification — completed
 
-The first dedicated Railway release reached SUCCESS (deployment d9293298-91cb-4b40-8604-8ee341fe1bdc). A real browser signup and a CORS request from the canonical domain both returned 200; restricted operational logs confirmed one newly persisted record and subsequent duplicate handling. The controlled record uses example.com and source controlled-release-smoke. Unapproved preflight origins were rejected with 403. A replacement-container and final canonical publication check follow before the final deployment report. See evidence/live-smoke.json for browser evidence.
+The public website is live at https://prospectpartnership.co.uk/. PR #1 was merged after GitHub CI passed. The canonical domain was fetched after publication and verified to serve the new headline, canvas script, brand assets and updated robots policy.
+
+The dedicated collector's final application deployment is `205e9ce0-d9ad-4bc6-b638-144db2d7cf85`, terminal **SUCCESS**, pinned to application commit `765ef8b832037a4356d09c601a8030639439b33d`. It replaces initial successful deployment `d9293298-91cb-4b40-8604-8ee341fe1bdc` while retaining the same private volume.
+
+A controlled example.com signup was created through the real browser on the initial deployment. After replacement, operational logs reported **duplicate** for that exact controlled registration, verifying that its row survived replacement. These logs contain only event/result fields and no address or request payload. The final browser check submitted the published canonical homepage form successfully, exercised exact-origin cross-site persistence, and verified a 403 for an unapproved preflight origin. See `evidence/live-smoke.json` for all three release phases. The controlled record is clearly labelled `controlled-release-smoke`; no email was sent and no real customer registration was edited or deleted.
+
+Readback of the Railway environment confirmed one replica and the attached private volume. The existing `prospect-ui-preview` and `prospect-staging` services retain their original deployment IDs; neither was modified. There are no pending staged changes.
+
+The application collector is deliberately pinned to its tested release; future source pushes alone do not replace it. Deploy future backend updates explicitly, preserve the volume, and verify persistence before publishing dependent static frontend changes. GitHub Pages retains the existing canonical domain; no DNS change was needed.
+
+Remaining verification limits: Firefox/WebKit executables were unavailable; real-user Core Web Vitals, independent screen-reader certification, provider agreement/backup operations and an automated email communication process were not verified or configured by this release. The official company LinkedIn URL still needs an authentic destination; Fred's personal profile remains correctly labelled.
