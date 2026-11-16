@@ -11,6 +11,7 @@ try {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, colorScheme: 'light', recordVideo: { dir: temp, size: { width: 1440, height: 1000 } } });
   const page = await context.newPage();
   await page.goto('http://127.0.0.1:3196/', { waitUntil: 'networkidle' });
+  await page.locator('meta[name=waitlist-endpoint]').evaluate(e => e.content = '/api/waitlist');
   await page.waitForTimeout(1500);
   await page.locator('.hero .text-link').click();
   await page.waitForTimeout(1200);

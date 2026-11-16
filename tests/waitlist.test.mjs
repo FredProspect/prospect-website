@@ -94,3 +94,16 @@ test('rejects malformed, oversized and non-JSON submissions without leaking form
     assert.match(html, /<form id="waitlist-form" method="post" action="\/api\/waitlist">/);
   } finally { await app.close(); rmSync(folder, { recursive: true }); }
 });
+test('cross-origin collector accepts only configured public sites, including preflight', async () => {
+  const app = await start({ additionalOrigin: 'https://preview.example.com' });
+  try {
+    const options = origin => fetch(app.url + '/api/waitlist', { method: 'OPTIONS', headers: { Origin: origin, 'Access-Control-Request-Method': 'POST', 'Access-Control-Request-Headers': 'content-type' } });
+    const approved = await options('https://preview.example.com');
+    assert.equal(approved.status, 204);
+    assert.equal(approved.headers.get('access-control-allow-origin'), 'https://preview.example.com');
+    assert.equal(approved.headers.get('vary'), 'Origin');
+    const denied = await options('https://attacker.example.com');
+    assert.equal(denied.status, 403);
+    assert.equal(denied.headers.get('access-control-allow-origin'), null);
+  } finally { await app.close(); }
+});

@@ -31,4 +31,4 @@ Browser scripts use the installed `/usr/bin/chromium`; change the executable pat
 
 `npm run build` is deterministic and regenerates tracked HTML from `scripts/pages.mjs` and `scripts/build.mjs`, copies only public assets to `dist/`, and updates sitemap/robots. Edit those source modules rather than generated HTML. No secrets, tests or database files are served.
 
-Do not deploy automatically. A static-only host cannot run this waitlist. See the handoff for a durable, same-origin Node deployment and its release gates.
+The canonical site uses GitHub Pages with the dedicated Railway collector in `deployment.json`. A static-only host cannot run the collector itself. See the handoff for a durable, Node deployment and exact-origin CORS configuration and its release gates.

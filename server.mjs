@@ -10,6 +10,8 @@ export function createApp(config = {}) {
   const origin = config.origin || process.env.PUBLIC_ORIGIN || 'http://localhost:3000';
   const dbPath = config.dbPath || process.env.WAITLIST_DB;
   const secret = config.secret || process.env.WAITLIST_RATE_SECRET;
+  const additionalOrigin = config.additionalOrigin || process.env.ADDITIONAL_PUBLIC_ORIGIN;
+  const allowedOrigins = new Set([origin, ...(additionalOrigin ? [additionalOrigin] : [])]);
   let db;
   if (dbPath && secret?.length >= 32) {
     mkdirSync(dirname(resolve(dbPath)), { recursive: true, mode: 0o700 });
@@ -24,13 +26,24 @@ export function createApp(config = {}) {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
+    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://prospect-public-website-staging.up.railway.app; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
     const url = new URL(req.url, origin);
     if (url.pathname === '/api/waitlist') {
+      if (allowedOrigins.has(req.headers.origin)) {
+        res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+        res.setHeader('Vary', 'Origin');
+      }
+      if (req.method === 'OPTIONS') {
+        if (!allowedOrigins.has(req.headers.origin)) return reply(res, 403, { error: 'Origin not allowed.' });
+        res.setHeader('Access-Control-Allow-Methods', 'POST');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+        res.setHeader('Access-Control-Max-Age', '600');
+        res.writeHead(204); return res.end();
+      }
       if (req.method !== 'POST') return reply(res, 405, { error: 'Use POST to register.' });
-      if (req.headers.origin !== origin) return reply(res, 403, { error: 'Please submit the form from the Prospect website.' });
+      if (!allowedOrigins.has(req.headers.origin)) return reply(res, 403, { error: 'Please submit the form from the Prospect website.' });
       if (!db) return reply(res, 503, { error: 'Registration is temporarily unavailable. Please try again later or contact the founder.' });
-      const ip = process.env.TRUST_PROXY === '1' ? (req.headers['x-forwarded-for'] || '').split(',')[0].trim() : req.socket.remoteAddress;
+      const ip = process.env.TRUST_PROXY === '1' ? (req.headers['x-real-ip'] || req.socket.remoteAddress) : req.socket.remoteAddress;
       const key = createHmac('sha256', secret).update(ip || 'unknown').digest('hex');
       const now = Date.now();
       try {
@@ -51,7 +64,8 @@ export function createApp(config = {}) {
         if (input.website) return reply(res, 400, { error: 'Unable to register. Please try again.' });
         const source = typeof input.source === 'string' ? input.source.replace(/[^a-zA-Z0-9_.-]/g, '').slice(0, 100) : 'homepage';
         const at = new Date().toISOString();
-        db.prepare('INSERT INTO waitlist VALUES (?, ?, ?, ?, ?) ON CONFLICT(email) DO NOTHING').run(email, at, 'waitlist-2026-11-16', at, source);
+        const inserted = db.prepare('INSERT INTO waitlist VALUES (?, ?, ?, ?, ?) ON CONFLICT(email) DO NOTHING').run(email, at, 'waitlist-2026-11-16', at, source);
+        if (process.env.LOG_WAITLIST_EVENTS === '1') console.log(JSON.stringify({ event: 'waitlist.persistence', result: inserted.changes ? 'created' : 'duplicate' }));
         return reply(res, 200, { message: 'You’re on the list. We’ll email you with Prospect launch and early-access news. If you’ve joined before, your registration is already saved.' });
       } catch (error) {
         if (error instanceof SyntaxError) return reply(res, 400, { error: 'Please check your form and try again.' });

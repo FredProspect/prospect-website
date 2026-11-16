@@ -33,3 +33,7 @@ Qualitative intent mapping, not search-volume research or a claim of ranking dem
 | Trading portfolio risk analysis | `/portfolio-risk-management/` | Explain correlation, concentration and common exposure |
 
 No external keyword-volume service or competitor data was used. Informative pages, natural phrasing, transparent availability, real company identity and risk context are the trust strategy. Old institutional routes are retired in place, `noindex,follow`, excluded from the sitemap and linked to the current relevant destination. They do not silently advertise the previous product.
+
+## Second visual pass
+
+The supplied headshot was matched to and extracted unchanged from the existing founder-profile PDF in Drive. Official full logo lockups/marks now come from the Living UI brand pack, rather than the earlier website's simplified SVG plus typed wordmark. The second pass adds a mathematical canvas landscape, custom SVG research/risk/intelligence graphics, deliberate photographic framing, richer backgrounds and motion. See the current HANDOFF.md for deployed architecture; its second-pass release status supersedes the first-pass missing-configuration notes above.

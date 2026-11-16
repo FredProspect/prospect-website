@@ -25,6 +25,7 @@ try {
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
       await page.goto('http://127.0.0.1:3198/', { waitUntil: 'networkidle' });
+      await page.locator('meta[name=waitlist-endpoint]').evaluate(e => e.content = '/api/waitlist');
       assert.equal(await page.locator('html').getAttribute('data-theme'), theme);
       await page.keyboard.press('Tab');
       assert.equal(await page.locator('.skip').evaluate(e => e === document.activeElement), true, 'keyboard skip link');
@@ -64,6 +65,7 @@ try {
   try {
     const page = await browser.newPage();
     await page.goto('http://127.0.0.1:3197/');
+    await page.locator('meta[name=waitlist-endpoint]').evaluate(e => e.content = '/api/waitlist');
     await page.locator('#email').fill('failure@example.com');
     await page.locator('[name=consent]').check();
     await page.locator('.submit').click();

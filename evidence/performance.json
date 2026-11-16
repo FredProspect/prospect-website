@@ -7,29 +7,29 @@
       "best-practices": 100,
       "seo": 100
     },
-    "LCP_ms": 900.9697000000001,
-    "CLS": 0,
-    "TBT_ms": 14.5,
+    "LCP_ms": 905.9568999999999,
+    "CLS": 0.001140401761132359,
+    "TBT_ms": 4.5,
     "failedAudits": [
       {
-        "id": "max-potential-fid",
-        "title": "Max Potential First Input Delay",
-        "displayValue": "80 ms"
+        "id": "mainthread-work-breakdown",
+        "title": "Minimize main-thread work",
+        "displayValue": "2.7 s"
       },
       {
         "id": "cache-insight",
         "title": "Use efficient cache lifetimes",
-        "displayValue": "Est savings of 117 KiB"
+        "displayValue": "Est savings of 411 KiB"
       },
       {
         "id": "document-latency-insight",
         "title": "Document request latency",
-        "displayValue": "Est savings of 9 KiB"
+        "displayValue": "Est savings of 11 KiB"
       },
       {
         "id": "image-delivery-insight",
         "title": "Improve image delivery",
-        "displayValue": "Est savings of 59 KiB"
+        "displayValue": "Est savings of 406 KiB"
       },
       {
         "id": "network-dependency-tree-insight",
@@ -38,7 +38,7 @@
       {
         "id": "render-blocking-insight",
         "title": "Render-blocking requests",
-        "displayValue": "Est savings of 110 ms"
+        "displayValue": "Est savings of 150 ms"
       }
     ]
   },
@@ -50,29 +50,29 @@
       "best-practices": 100,
       "seo": 100
     },
-    "LCP_ms": 902.065,
-    "CLS": 0,
+    "LCP_ms": 902.4004,
+    "CLS": 0.000008140287677954671,
     "TBT_ms": 0,
     "failedAudits": [
       {
         "id": "max-potential-fid",
         "title": "Max Potential First Input Delay",
-        "displayValue": "90 ms"
+        "displayValue": "120 ms"
       },
       {
         "id": "cache-insight",
         "title": "Use efficient cache lifetimes",
-        "displayValue": "Est savings of 117 KiB"
+        "displayValue": "Est savings of 411 KiB"
       },
       {
         "id": "document-latency-insight",
         "title": "Document request latency",
-        "displayValue": "Est savings of 9 KiB"
+        "displayValue": "Est savings of 11 KiB"
       },
       {
         "id": "image-delivery-insight",
         "title": "Improve image delivery",
-        "displayValue": "Est savings of 59 KiB"
+        "displayValue": "Est savings of 406 KiB"
       },
       {
         "id": "network-dependency-tree-insight",
@@ -81,7 +81,7 @@
       {
         "id": "render-blocking-insight",
         "title": "Render-blocking requests",
-        "displayValue": "Est savings of 140 ms"
+        "displayValue": "Est savings of 10 ms"
       }
     ]
   }

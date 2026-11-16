@@ -5,7 +5,7 @@ COPY package.json package-lock.json ./
 COPY scripts ./scripts
 COPY assets ./assets
 COPY brand ./brand
-COPY favicon.svg ./
+COPY favicon.svg deployment.json ./
 RUN node scripts/build.mjs
 
 FROM node:24-bookworm-slim
@@ -15,7 +15,7 @@ COPY --from=build /app/dist ./dist
 COPY server.mjs ./
 COPY package.json ./
 COPY scripts/export-waitlist.mjs ./scripts/export-waitlist.mjs
+COPY scripts/start.mjs ./scripts/start.mjs
 RUN mkdir -p /var/lib/prospect && chown node:node /var/lib/prospect
-USER node
 EXPOSE 3000
-CMD ["node", "server.mjs"]
+CMD ["node", "scripts/start.mjs"]

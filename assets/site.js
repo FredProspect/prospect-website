@@ -41,7 +41,7 @@ form?.addEventListener('submit', async event => {
   status.classList.remove('error');
   status.textContent = 'Saving your registration…';
   try {
-    const response = await fetch('/api/waitlist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: form.email.value, consent: form.consent.checked, website: form.website.value, source: new URLSearchParams(location.search).get('utm_source') || 'homepage' }), signal: AbortSignal.timeout(12000) });
+    const response = await fetch(document.querySelector('meta[name=waitlist-endpoint]')?.content || '/api/waitlist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: form.email.value, consent: form.consent.checked, website: form.website.value, source: new URLSearchParams(location.search).get('utm_source') || 'homepage' }), signal: AbortSignal.timeout(12000) });
     const result = await response.json();
     if (!response.ok) throw Error(result.error || 'Registration unavailable. Please try again later.');
     status.textContent = result.message;
