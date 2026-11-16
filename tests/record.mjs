@@ -1,0 +1,32 @@
+import { chromium } from '@playwright/test';
+import { mkdtempSync, rmSync, copyFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { createApp } from '../server.mjs';
+const temp = mkdtempSync(join(tmpdir(), 'prospect-record-'));
+const app = createApp({ origin: 'http://127.0.0.1:3196', dbPath: join(temp, 'leads.sqlite'), secret: 'controlled-recording-secret-over-32-characters' });
+await new Promise(resolve => app.listen(3196, '127.0.0.1', resolve));
+const browser = await chromium.launch({ executablePath: '/usr/bin/chromium', args: ['--no-sandbox'] });
+try {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, colorScheme: 'light', recordVideo: { dir: temp, size: { width: 1440, height: 1000 } } });
+  const page = await context.newPage();
+  await page.goto('http://127.0.0.1:3196/', { waitUntil: 'networkidle' });
+  await page.waitForTimeout(1500);
+  await page.locator('.hero .text-link').click();
+  await page.waitForTimeout(1200);
+  await page.locator('[data-preview=builder]').click();
+  await page.waitForTimeout(1200);
+  await page.locator('.theme').click();
+  await page.waitForTimeout(1200);
+  await page.locator('.nav .primary').click();
+  await page.waitForTimeout(1000);
+  await page.locator('#email').fill('walkthrough@example.com');
+  await page.locator('[name=consent]').check();
+  await page.locator('.submit').click();
+  await page.waitForFunction(() => document.querySelector('#form-status').textContent.startsWith('You’re on the list.'));
+  await page.waitForTimeout(1500);
+  const video = page.video();
+  await context.close();
+  copyFileSync(await video.path(), 'evidence/walkthrough.webm');
+  console.log('Recorded real browser walkthrough with controlled local test persistence.');
+} finally { await browser.close(); await new Promise(resolve => app.close(resolve)); rmSync(temp, { recursive: true }); }

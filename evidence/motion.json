@@ -1,0 +1,7 @@
+{
+  "samples": 120,
+  "medianFrame_ms": 16.699999999999818,
+  "p95Frame_ms": 16.700000000000273,
+  "framesOver35ms": 0,
+  "note": "Local Chromium rAF sample during hero animation; not real-user FPS, battery or INP."
+}
