@@ -1,0 +1,11 @@
+[
+  {
+    "checkedAt": "2026-11-16T23:43:42.911Z",
+    "phase": "initial-persistent-deploy",
+    "collector": "https://prospect-public-website-staging.up.railway.app",
+    "collectorUi": "passed",
+    "canonicalContentUpdated": false,
+    "canonicalCors": "passed",
+    "unapprovedOrigin": "rejected"
+  }
+]

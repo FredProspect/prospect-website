@@ -1,34 +1,34 @@
-# Prospect
+# Prospect public website
 
-[Prospect](https://prospectpartnership.co.uk/) is building the AI-native intelligence and decision layer between systematic strategies and capital.
+Customer-first, pre-launch trading research website. Static HTML and a small Node 24 server with a private SQLite waitlist. The trading application is a separate repository and is unchanged.
 
-The company is designed for systematic investment firms. Prospect progressively connects five layers:
+- [Audit and design direction](docs/AUDIT.md)
+- [Implementation, verification and production handoff](docs/HANDOFF.md)
+- [Local test measurements](evidence/performance.json)
 
-1. **Strategy understanding** — strategy identity, family, thesis, expected edge, dependencies and data lineage.
-2. **Strategy intelligence** — strategy-specific evidence, behavioural fingerprints, changing reliability and uncertainty.
-3. **Regime intelligence** — market context and strategy/regime compatibility.
-4. **Portfolio intelligence** — correlation, concentration, common exposures, diversification and cross-strategy interactions.
-5. **Capital-allocation intelligence** — constraint-aware, explainable allocation scenarios for human review.
+## Development
 
-Strategy reliability and change detection are the first executable capabilities inside that architecture. They are not the definition of Prospect and the company should not be described as a generic monitoring platform.
+```sh
+npm ci --ignore-scripts
+npm run build
+npm start
+```
 
-**Legal company:** Prospect Partnership Ltd · Company No. 15277481 · England & Wales  
-**Founder:** [Fred Boxer](https://www.linkedin.com/in/fred-boxer-93025a388/)  
-**Website:** https://prospectpartnership.co.uk/  
-**Contact:** founder@prospectpartnership.co.uk
+Without waitlist environment variables the form deliberately returns an unavailable state. It never reports an unpersisted registration as successful. To exercise it locally, set `PUBLIC_ORIGIN` to the exact local origin (default `http://localhost:3000`), `WAITLIST_DB` to a private local database path, and `WAITLIST_RATE_SECRET` to a random secret of at least 32 characters. Do not commit `.env` or data. The server does not automatically load `.env`; use your hosting secret manager or Node's `--env-file` option.
 
-Prospect is pre-seed and building V1. Initial deployment is institutional decision support: Prospect supplies evidence, intelligence and proposed scenarios while customers retain discretion over capital deployment.
+## Checks
 
-## Research and product topics
+```sh
+npm run check
+npm run lint
+npm run build
+npm test
+npm run test:browser
+node tests/performance.mjs
+```
 
-- [Systematic portfolio management](https://prospectpartnership.co.uk/systematic-portfolio-management/)
-- [Quant portfolio management](https://prospectpartnership.co.uk/quant-portfolio-management/)
-- [Multi-strategy portfolio management](https://prospectpartnership.co.uk/multi-strategy-portfolio-management/)
-- [Systematic strategy monitoring](https://prospectpartnership.co.uk/strategy-monitoring/)
-- [Strategy drift detection](https://prospectpartnership.co.uk/strategy-drift-detection/)
-- [Portfolio risk management](https://prospectpartnership.co.uk/portfolio-risk-management/)
-- [Capital allocation across systematic strategies](https://prospectpartnership.co.uk/capital-allocation/)
-- [Regime-aware portfolio allocation](https://prospectpartnership.co.uk/regime-aware-allocation/)
-- [AI-native portfolio management](https://prospectpartnership.co.uk/ai-native-portfolio-management/)
-- [Prospect Insights](https://prospectpartnership.co.uk/insights/)
-- [About Prospect](https://prospectpartnership.co.uk/about/)
+Browser scripts use the installed `/usr/bin/chromium`; change the executable path for another host. Other engine availability is recorded, never treated as a passing cross-browser check. Tests create temporary SQLite databases with example.com addresses and remove them afterward. Runtime has no npm dependencies. TypeScript was not introduced to an HTML/JavaScript repository; JS syntax and ESLint checks apply.
+
+`npm run build` is deterministic and regenerates tracked HTML from `scripts/pages.mjs` and `scripts/build.mjs`, copies only public assets to `dist/`, and updates sitemap/robots. Edit those source modules rather than generated HTML. No secrets, tests or database files are served.
+
+The canonical site uses GitHub Pages with the dedicated Railway collector in `deployment.json`. A static-only host cannot run the collector itself. See the handoff for a durable, Node deployment and exact-origin CORS configuration and its release gates.

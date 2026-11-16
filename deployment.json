@@ -1,0 +1,4 @@
+{
+  "waitlistEndpoint": "https://prospect-public-website-staging.up.railway.app/api/waitlist",
+  "publicOrigin": "https://prospectpartnership.co.uk"
+}

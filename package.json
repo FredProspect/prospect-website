@@ -1,0 +1,6 @@
+{
+  "name": "prospect-public-website", "version": "2.0.0", "private": true, "type": "module",
+  "engines": {"node": ">=24.0.0"},
+  "scripts": {"build": "node scripts/build.mjs", "start": "node server.mjs", "dev": "node server.mjs", "check": "node --check server.mjs && node --check assets/site.js && node --check scripts/build.mjs", "lint": "eslint .", "test": "node --test tests/*.test.mjs", "test:browser": "node tests/browser.mjs", "export:waitlist": "node scripts/export-waitlist.mjs"},
+  "devDependencies": {"eslint": "^9.39.0", "@playwright/test": "^1.56.1", "@axe-core/playwright": "^4.11.0", "lighthouse": "^13.0.1"}
+}

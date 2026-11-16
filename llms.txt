@@ -1,32 +1,5 @@
 # Prospect
 
-Prospect is building the AI-native intelligence and decision layer between systematic strategies and capital for systematic investment firms.
+Pre-launch AI-native trading research for independent traders. Product previews are prototypes. No execution, fund management or performance promises.
 
-Canonical site: https://prospectpartnership.co.uk/
-Company: Prospect Partnership Ltd
-Founder: Fred Boxer
-Contact: founder@prospectpartnership.co.uk
-
-Company architecture:
-- Strategy understanding: strategy identity, thesis, family, dependencies and data lineage.
-- Strategy intelligence: strategy-specific evidence, behavioural fingerprints, changing reliability and uncertainty.
-- Regime intelligence: market context and strategy/regime compatibility.
-- Portfolio intelligence: correlation, concentration, common exposures, diversification and cross-strategy interactions.
-- Capital-allocation intelligence: constraint-aware, explainable allocation scenarios for human review.
-
-Strategy reliability and change detection are the first executable capabilities inside the wider Prospect intelligence layer. Prospect is not a generic monitoring platform.
-
-Core topics and canonical pages:
-- Systematic portfolio management: https://prospectpartnership.co.uk/systematic-portfolio-management/
-- Quant portfolio management: https://prospectpartnership.co.uk/quant-portfolio-management/
-- Multi-strategy portfolio management: https://prospectpartnership.co.uk/multi-strategy-portfolio-management/
-- Strategy monitoring: https://prospectpartnership.co.uk/strategy-monitoring/
-- Strategy drift detection: https://prospectpartnership.co.uk/strategy-drift-detection/
-- Portfolio risk management: https://prospectpartnership.co.uk/portfolio-risk-management/
-- Capital allocation: https://prospectpartnership.co.uk/capital-allocation/
-- Regime-aware allocation: https://prospectpartnership.co.uk/regime-aware-allocation/
-- AI-native portfolio management: https://prospectpartnership.co.uk/ai-native-portfolio-management/
-- Insights: https://prospectpartnership.co.uk/insights/
-- Company and founder: https://prospectpartnership.co.uk/about/
-
-Prospect is pre-seed and building V1. Initial deployment is institutional decision support; customers retain discretion over capital deployment.
+https://prospectpartnership.co.uk/
