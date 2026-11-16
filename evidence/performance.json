@@ -7,14 +7,19 @@
       "best-practices": 100,
       "seo": 100
     },
-    "LCP_ms": 905.9568999999999,
-    "CLS": 0.001140401761132359,
-    "TBT_ms": 4.5,
+    "LCP_ms": 1146.5211,
+    "CLS": 0,
+    "TBT_ms": 32,
     "failedAudits": [
       {
-        "id": "mainthread-work-breakdown",
-        "title": "Minimize main-thread work",
-        "displayValue": "2.7 s"
+        "id": "first-contentful-paint",
+        "title": "First Contentful Paint",
+        "displayValue": "1.1 s"
+      },
+      {
+        "id": "max-potential-fid",
+        "title": "Max Potential First Input Delay",
+        "displayValue": "110 ms"
       },
       {
         "id": "cache-insight",
@@ -25,6 +30,10 @@
         "id": "document-latency-insight",
         "title": "Document request latency",
         "displayValue": "Est savings of 11 KiB"
+      },
+      {
+        "id": "forced-reflow-insight",
+        "title": "Forced reflow"
       },
       {
         "id": "image-delivery-insight",
@@ -50,14 +59,19 @@
       "best-practices": 100,
       "seo": 100
     },
-    "LCP_ms": 902.4004,
-    "CLS": 0.000008140287677954671,
-    "TBT_ms": 0,
+    "LCP_ms": 1148.378,
+    "CLS": 0,
+    "TBT_ms": 25,
     "failedAudits": [
+      {
+        "id": "first-contentful-paint",
+        "title": "First Contentful Paint",
+        "displayValue": "1.1 s"
+      },
       {
         "id": "max-potential-fid",
         "title": "Max Potential First Input Delay",
-        "displayValue": "120 ms"
+        "displayValue": "100 ms"
       },
       {
         "id": "cache-insight",
@@ -68,6 +82,10 @@
         "id": "document-latency-insight",
         "title": "Document request latency",
         "displayValue": "Est savings of 11 KiB"
+      },
+      {
+        "id": "forced-reflow-insight",
+        "title": "Forced reflow"
       },
       {
         "id": "image-delivery-insight",
@@ -81,7 +99,7 @@
       {
         "id": "render-blocking-insight",
         "title": "Render-blocking requests",
-        "displayValue": "Est savings of 10 ms"
+        "displayValue": "Est savings of 150 ms"
       }
     ]
   }

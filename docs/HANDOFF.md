@@ -56,11 +56,11 @@ Repository-sourced destinations remain `mailto:founder@prospectpartnership.co.uk
 - Build, JavaScript syntax, ESLint and whitespace checks; six Node integration tests (validation/consent, duplicates/restart persistence, rate limits, failures, malformed/oversized bodies, local links/metadata, CORS/preflight).
 - Chromium: eight viewport/theme combinations at 1440, 768, 390 and 320px, with keyboard skip link, required fields, visible hero CTA, product selection, theme, persisted signup, error state and zero page errors.
 - Axe WCAG A/AA automated checks: zero violations in those combinations. These are not independent accessibility certification or full screen-reader coverage.
-- Local Lighthouse after visual rebuild: mobile and desktop **100 Performance / 100 Accessibility / 100 Best Practices / 100 SEO**. LCP approximately 0.91/0.90 seconds, mobile CLS 0.00115 and desktop CLS <0.00001, TBT 4.5/0ms. Full reports/JSON are in `evidence/`.
+- Local Lighthouse after visual rebuild: mobile and desktop **100 Performance / 100 Accessibility / 100 Best Practices / 100 SEO**. LCP approximately 1.15 seconds on both profiles, CLS 0, TBT 32/25ms. Full reports/JSON are in `evidence/`.
 - A 120-frame local animation sample: median/p95 ~16.7ms with no >35ms frames. The mathematical canvas updates at a capped rate; rAF timing is not a guarantee of actual device FPS or battery use. Field LCP/CLS/INP remain unmeasured.
 - Firefox and WebKit executables remain unavailable; cross-engine validation is explicitly blocked, not passed.
 - Screenshots and an actual browser walkthrough are in `evidence/`; controlled local tests use temporary SQLite databases and example.com addresses. Live release verification is recorded separately below.
 
 ## Release verification
 
-Release in progress. Terminal deployment state, canonical-site publication and controlled live persistence checks must be recorded before reporting deployment complete.
+The first dedicated Railway release reached SUCCESS (deployment d9293298-91cb-4b40-8604-8ee341fe1bdc). A real browser signup and a CORS request from the canonical domain both returned 200; restricted operational logs confirmed one newly persisted record and subsequent duplicate handling. The controlled record uses example.com and source controlled-release-smoke. Unapproved preflight origins were rejected with 403. A replacement-container and final canonical publication check follow before the final deployment report. See evidence/live-smoke.json for browser evidence.

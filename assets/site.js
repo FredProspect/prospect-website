@@ -26,6 +26,7 @@ for (const button of document.querySelectorAll('[data-preview]')) button.addEven
   image.style.aspectRatio = '1440 / 971';
   image.style.objectFit = 'contain';
   image.alt = preview.alt;
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) image.animate([{ opacity: .45, transform: 'translateY(7px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)' });
   document.querySelector('#preview-title').textContent = preview.title;
   document.querySelector('#preview-copy').textContent = preview.copy;
   document.querySelectorAll('[data-preview]').forEach(other => other.setAttribute('aria-pressed', String(other === button)));
