@@ -21,6 +21,7 @@ try {
   for (const [width, height, device] of [[1440, 1000, 'desktop'], [390, 844, 'mobile'], [768, 1024, 'tablet'], [320, 740, 'small-mobile']]) {
     for (const theme of ['light', 'dark']) {
       const context = await browser.newContext({ viewport: { width, height }, colorScheme: theme, reducedMotion: 'reduce' });
+      if (theme === 'dark') await context.addInitScript(() => localStorage.setItem('prospect-theme', 'dark'));
       const page = await context.newPage();
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));

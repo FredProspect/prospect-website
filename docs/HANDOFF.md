@@ -1,5 +1,15 @@
 # Prospect website — visual rebuild and release
 
+## Light-first, reactive product design — 17 November 2026
+
+Light mode is now the standard for visitors without an explicit preference, including devices using a dark OS theme. The theme button remains available and an explicit visitor choice persists. Automatic OS theme changes do not override that choice or the light default.
+
+The bold “AI for the trader” headline, genuine Geist and minimum 14px text are retained. A native reactive emerald landscape returns to the hero with readable Idea / Strategy / Portfolio labels. Three keyboard-operable controls change the geometry and explanatory text, expressing a planned research workflow rather than simulating product output. Fine-pointer movement gently changes perspective; smaller/slower devices receive reduced rendering work. The canvas pauses offscreen/hidden and stays static for reduced-motion users; deliberate stage selection still changes the illustration without animation.
+
+Supporting design restores a composed brand grid/colour wash, depth and feedback around the genuine product showcase, a shared-exposure illustration, connected workflow graphics and understated portrait framing. No tiny HUD labels, financial results, invented data or promised working AI are added. The existing product screens, founder photo, pre-launch disclosures, waitlist storage and trading application are preserved.
+
+Validation: six integration tests, eight viewport/theme combinations with zero automated axe violations, actual loaded Geist files, default-light behaviour under a dark OS setting, persisted manual dark mode, keyboard scene changes, offscreen/reduced-motion behaviour, preview/FAQ controls and no-JavaScript content. Latest local Lighthouse: 100 in Performance, Accessibility, Best Practices and SEO on both explicit mobile and desktop profiles; LCP ~1.20s mobile / 0.34s desktop, CLS 0, TBT ~40.5ms / 0ms. Field performance and unavailable Firefox/WebKit engines remain unverified. See the updated reports, screenshots and walkthrough in `evidence/`.
+
 ## Trader-first editorial pass — 17 November 2026
 
 The homepage now says **AI for the trader**. The visual direction is deliberately simpler: bold solid Geist headlines, flat brand colours, larger reading text and a genuine product screenshot. The mathematical canvas, orbit/HUD composition, tiny section indices, glowing relationship diagrams, waveform decoration, portrait overlay stamp and oversized outline footer wordmark are removed from the rendered homepage. No background rendering script is shipped. Native preview transitions, keyboard-compatible FAQs and quieter control/theme feedback remain, with reduced-motion support.

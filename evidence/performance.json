@@ -2,44 +2,39 @@
   {
     "device": "mobile",
     "scores": {
-      "performance": 95,
+      "performance": 100,
       "accessibility": 100,
       "best-practices": 100,
       "seo": 100
     },
-    "LCP_ms": 2853.3458,
-    "CLS": 0.001387507398600101,
-    "TBT_ms": 68,
+    "LCP_ms": 1202.9034,
+    "CLS": 0,
+    "TBT_ms": 40.5,
     "failedAudits": [
       {
-        "id": "largest-contentful-paint",
-        "title": "Largest Contentful Paint",
-        "displayValue": "2.9 s"
-      },
-      {
-        "id": "total-blocking-time",
-        "title": "Total Blocking Time",
-        "displayValue": "70 ms"
+        "id": "first-contentful-paint",
+        "title": "First Contentful Paint",
+        "displayValue": "1.2 s"
       },
       {
         "id": "max-potential-fid",
         "title": "Max Potential First Input Delay",
-        "displayValue": "120 ms"
+        "displayValue": "110 ms"
       },
       {
-        "id": "interactive",
-        "title": "Time to Interactive",
-        "displayValue": "2.9 s"
+        "id": "mainthread-work-breakdown",
+        "title": "Minimize main-thread work",
+        "displayValue": "2.3 s"
       },
       {
         "id": "cache-insight",
         "title": "Use efficient cache lifetimes",
-        "displayValue": "Est savings of 453 KiB"
+        "displayValue": "Est savings of 487 KiB"
       },
       {
         "id": "document-latency-insight",
         "title": "Document request latency",
-        "displayValue": "Est savings of 9 KiB"
+        "displayValue": "Est savings of 11 KiB"
       },
       {
         "id": "forced-reflow-insight",
@@ -48,7 +43,7 @@
       {
         "id": "image-delivery-insight",
         "title": "Improve image delivery",
-        "displayValue": "Est savings of 408 KiB"
+        "displayValue": "Est savings of 406 KiB"
       },
       {
         "id": "network-dependency-tree-insight",
@@ -57,7 +52,7 @@
       {
         "id": "render-blocking-insight",
         "title": "Render-blocking requests",
-        "displayValue": "Est savings of 250 ms"
+        "displayValue": "Est savings of 170 ms"
       }
     ]
   },
@@ -69,8 +64,8 @@
       "best-practices": 100,
       "seo": 100
     },
-    "LCP_ms": 582.7633999999999,
-    "CLS": 0.0009971673026753852,
+    "LCP_ms": 339.4136,
+    "CLS": 0,
     "TBT_ms": 0,
     "failedAudits": [
       {
@@ -81,12 +76,12 @@
       {
         "id": "cache-insight",
         "title": "Use efficient cache lifetimes",
-        "displayValue": "Est savings of 453 KiB"
+        "displayValue": "Est savings of 487 KiB"
       },
       {
         "id": "document-latency-insight",
         "title": "Document request latency",
-        "displayValue": "Est savings of 9 KiB"
+        "displayValue": "Est savings of 11 KiB"
       },
       {
         "id": "forced-reflow-insight",
@@ -95,7 +90,7 @@
       {
         "id": "image-delivery-insight",
         "title": "Improve image delivery",
-        "displayValue": "Est savings of 393 KiB"
+        "displayValue": "Est savings of 387 KiB"
       },
       {
         "id": "network-dependency-tree-insight",
@@ -104,7 +99,7 @@
       {
         "id": "render-blocking-insight",
         "title": "Render-blocking requests",
-        "displayValue": "Est savings of 40 ms"
+        "displayValue": "Est savings of 30 ms"
       }
     ]
   }
