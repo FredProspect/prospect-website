@@ -1,5 +1,15 @@
 # Prospect website — visual rebuild and release
 
+## Geist typography and motion refinement — 17 November 2026
+
+The current public refinement uses genuine locally hosted Geist Regular (400), Medium (500) and Semibold (600). The previous broad 600–900 declaration is corrected and synthetic font weights are disabled. Headlines now have deliberate weight contrast and line rhythm; paragraphs, labels, navigation, FAQs, consent text and disclosures have larger, clearer type, restrained tracking and comfortable line lengths. Responsive text remains readable at 320px and the hero CTA stays on the first screen. No claims, verified brand assets or founder information are changed.
+
+Motion adds coordinated hero entrances, independently staggered content, decoded-image preview crossfades with rapid-selection protection, animated keyboard-compatible disclosures, theme transitions and refined button/link feedback. Headline and introductory copy remain visible from the first paint; animation does not delay reading. The mathematical canvas shares one geometry buffer between mesh directions and batches paint calls. It uses time-based progression with fine-pointer response, targets 60fps on capable desktops, reduces work on smaller/slower devices and stops offscreen or when the document is hidden. Schematic loops pause outside the viewport. Reduced-motion changes cancel active entrances, disclosures and crossfades and render a static field; content remains available with JavaScript disabled.
+
+Styles/scripts receive deterministic content-hash query versions so returning visitors receive the matching release rather than a cached mix of old and new assets. The waitlist API, storage, consent requirements and existing trading services are unchanged.
+
+Verification: eight viewport/theme combinations pass, with zero automated axe violations; six Node integration tests, syntax/build/lint and link checks pass. Additional real-browser checks verify actual loaded Geist files at all three weights, readable paragraph sizing, active/offscreen/reduced canvas behaviour, rapid preview selection, keyboard disclosures and no-JavaScript headline/CTA visibility. See `evidence/typography-motion.json`. Local Lighthouse is 100 in all four categories on mobile and desktop, LCP about 1.14/1.15s, TBT 63/70.5ms, CLS 0/<0.00011. These remain laboratory observations, not field Core Web Vitals or universal frame-rate guarantees. Firefox/WebKit verification remains unavailable.
+
 ## Design
 
 The second implementation replaces the basic first pass with a cinematic emerald hero, an animated mathematical landscape, an illuminated brand instrument, editorial typography, a grid-backed product stage, an illustrated research note, shared-exposure graphics, animated intelligence paths, portrait-led founder story, framed signup form and oversized outline footer lettering. Native canvas and CSS provide the graphics without a rendering dependency. The landscape is expressly a concept, never market data or trading results.
@@ -61,7 +71,7 @@ Repository-sourced destinations remain `mailto:founder@prospectpartnership.co.uk
 - Firefox and WebKit executables remain unavailable; cross-engine validation is explicitly blocked, not passed.
 - Screenshots and an actual browser walkthrough are in `evidence/`; controlled local tests use temporary SQLite databases and example.com addresses. Live release verification is recorded separately below.
 
-## Release verification — completed
+## Initial launch verification — 16 November 2026
 
 The public website is live at https://prospectpartnership.co.uk/. PR #1 was merged after GitHub CI passed. The canonical domain was fetched after publication and verified to serve the new headline, canvas script, brand assets and updated robots policy.
 

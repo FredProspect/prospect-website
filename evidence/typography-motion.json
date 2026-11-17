@@ -1,0 +1,105 @@
+{
+  "results": [
+    {
+      "width": 1440,
+      "typography": {
+        "family": "Geist, system-ui, sans-serif",
+        "weights": [
+          {
+            "weight": 400,
+            "loaded": true
+          },
+          {
+            "weight": 500,
+            "loaded": true
+          },
+          {
+            "weight": 600,
+            "loaded": true
+          }
+        ],
+        "body": 17,
+        "headline": [
+          "400",
+          "400",
+          "600"
+        ],
+        "fonts": [
+          {
+            "family": "Geist",
+            "weight": "400",
+            "status": "loaded"
+          },
+          {
+            "family": "Geist",
+            "weight": "600",
+            "status": "loaded"
+          },
+          {
+            "family": "Geist",
+            "weight": "500",
+            "status": "loaded"
+          }
+        ]
+      },
+      "activeCanvas": "animated",
+      "offscreenCanvas": "paused",
+      "rapidPreviewSelection": "passed",
+      "keyboardDisclosure": "passed",
+      "themeTransition": "two switches complete with matching final palette",
+      "reducedMotion": "static; no running animations",
+      "pageErrors": []
+    },
+    {
+      "width": 390,
+      "typography": {
+        "family": "Geist, system-ui, sans-serif",
+        "weights": [
+          {
+            "weight": 400,
+            "loaded": true
+          },
+          {
+            "weight": 500,
+            "loaded": true
+          },
+          {
+            "weight": 600,
+            "loaded": true
+          }
+        ],
+        "body": 16,
+        "headline": [
+          "400",
+          "400",
+          "600"
+        ],
+        "fonts": [
+          {
+            "family": "Geist",
+            "weight": "400",
+            "status": "loaded"
+          },
+          {
+            "family": "Geist",
+            "weight": "600",
+            "status": "loaded"
+          },
+          {
+            "family": "Geist",
+            "weight": "500",
+            "status": "loaded"
+          }
+        ]
+      },
+      "activeCanvas": "animated",
+      "offscreenCanvas": "paused",
+      "rapidPreviewSelection": "passed",
+      "keyboardDisclosure": "passed",
+      "themeTransition": "two switches complete with matching final palette",
+      "reducedMotion": "static; no running animations",
+      "pageErrors": []
+    }
+  ],
+  "withoutJavaScript": "headline and primary CTA visible"
+}
