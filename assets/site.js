@@ -8,15 +8,20 @@ function setTheme(theme) {
 let saved;
 try { saved = localStorage.getItem('prospect-theme'); } catch { /* Storage is optional. */ }
 setTheme(saved === 'light' || saved === 'dark' ? saved : preference.matches ? 'dark' : 'light');
-let themeTimer;
+let themeTransition;
 themeButton?.addEventListener('click', () => {
-  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    document.documentElement.classList.add('theme-shifting');
-    clearTimeout(themeTimer);
-    themeTimer = setTimeout(() => document.documentElement.classList.remove('theme-shifting'), 400);
-  }
-  saved = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-  setTheme(saved);
+  const current = saved || document.documentElement.dataset.theme;
+  saved = current === 'dark' ? 'light' : 'dark';
+  const target = saved;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (document.startViewTransition && !reduced) {
+    themeTransition?.skipTransition();
+    const rect = themeButton.getBoundingClientRect();
+    document.documentElement.style.setProperty('--theme-x', `${rect.left + rect.width / 2}px`);
+    document.documentElement.style.setProperty('--theme-y', `${rect.top + rect.height / 2}px`);
+    themeTransition = document.startViewTransition(() => setTheme(target));
+    themeTransition.ready.catch(() => { /* A newer theme request may skip this snapshot. */ });
+  } else setTheme(target);
   try { localStorage.setItem('prospect-theme', saved); } catch { /* Preference only, never lead data. */ }
 });
 preference.addEventListener('change', () => { if (!saved) setTheme(preference.matches ? 'dark' : 'light'); });

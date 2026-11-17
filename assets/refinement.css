@@ -132,9 +132,14 @@ input[type=email] { font-size: 16px; line-height: 1.5; }
 .text-link:hover::after, .text-link:focus-visible::after { transform: scaleX(1); opacity: 1; }
 .theme { transition: transform .5s var(--ease-out), background-color .3s; }
 .theme:hover { transform: rotate(25deg); background: var(--wash); }
-.theme-shifting body, .theme-shifting .header, .theme-shifting .footer,
-.theme-shifting .demo-tabs, .theme-shifting .research-sheet {
-  transition: background-color .35s ease, color .35s ease, border-color .35s ease;
+/* Reveal an intact palette from its control; avoid low-contrast colour crossfades. */
+::view-transition { pointer-events: none; }
+::view-transition-group(root) { animation: none; }
+::view-transition-old(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-new(root) { animation: theme-reveal .55s var(--ease-out); mix-blend-mode: normal; }
+@keyframes theme-reveal {
+  from { clip-path: circle(0 at var(--theme-x, 90%) var(--theme-y, 40px)); }
+  to { clip-path: circle(150vmax at var(--theme-x, 90%) var(--theme-y, 40px)); }
 }
 .demo { position: relative; }
 .demo .preview-outgoing { position: absolute; pointer-events: none; z-index: 2; max-height: none; object-fit: contain; margin: 0; }
@@ -221,4 +226,5 @@ input[type=email] { font-size: 16px; line-height: 1.5; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none!important; transition: none!important; }
   .btn:hover, .theme:hover, .btn:hover > span { transform: none; }
+  ::view-transition-new(root), ::view-transition-old(root), ::view-transition-group(root) { animation: none!important; }
 }

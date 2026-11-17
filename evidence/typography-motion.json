@@ -46,6 +46,7 @@
       "offscreenCanvas": "paused",
       "rapidPreviewSelection": "passed",
       "keyboardDisclosure": "passed",
+      "themeTransition": "two switches complete with matching final palette",
       "reducedMotion": "static; no running animations",
       "pageErrors": []
     },
@@ -95,6 +96,7 @@
       "offscreenCanvas": "paused",
       "rapidPreviewSelection": "passed",
       "keyboardDisclosure": "passed",
+      "themeTransition": "two switches complete with matching final palette",
       "reducedMotion": "static; no running animations",
       "pageErrors": []
     }

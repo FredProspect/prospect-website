@@ -47,6 +47,11 @@ try {
     await page.waitForTimeout(450);
     await page.keyboard.press('Enter');
     await page.waitForFunction(() => !document.querySelector('.faq details').open);
+    await page.locator('.theme').click();
+    await page.waitForFunction(() => document.documentElement.dataset.theme === 'dark');
+    await page.locator('.theme').click();
+    await page.waitForFunction(() => document.documentElement.dataset.theme === 'light');
+    await page.waitForTimeout(650);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.locator('.hero').scrollIntoViewIfNeeded();
     await page.waitForTimeout(200);
@@ -55,7 +60,7 @@ try {
     assert.equal(await pixels(), reduced, 'reduced motion remains static');
     assert.equal(await page.evaluate(() => document.getAnimations().filter(a => a.playState === 'running').length), 0);
     assert.equal(errors.length, 0);
-    results.push({ width, typography, activeCanvas: 'animated', offscreenCanvas: 'paused', rapidPreviewSelection: 'passed', keyboardDisclosure: 'passed', reducedMotion: 'static; no running animations', pageErrors: errors });
+    results.push({ width, typography, activeCanvas: 'animated', offscreenCanvas: 'paused', rapidPreviewSelection: 'passed', keyboardDisclosure: 'passed', themeTransition: 'two switches complete with matching final palette', reducedMotion: 'static; no running animations', pageErrors: errors });
     await page.close();
   }
   const noScript = await browser.newPage({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
