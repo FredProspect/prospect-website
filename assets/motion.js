@@ -59,3 +59,49 @@ motionPreference.addEventListener('change', () => {
   for (const [details, { animation, nextOpen }] of disclosureAnimations) { animation.cancel(); details.open = nextOpen; details.style.overflow = ''; }
   disclosureAnimations.clear();
 });
+
+// Local pointer feedback: no global mouse loop or extra rendering surface.
+const precisePointer = matchMedia('(hover: hover) and (pointer: fine)');
+const reactiveSurfaces = [...document.querySelectorAll('[data-reactive-background],.btn.primary')];
+const reactiveStates = new Map();
+let feedbackFrame = 0;
+function clearFeedback() {
+  if (feedbackFrame) cancelAnimationFrame(feedbackFrame);
+  feedbackFrame = 0;
+  for (const [node] of reactiveStates) {
+    ['--ambient-x', '--ambient-y', '--detail-x', '--detail-y', '--button-x', '--button-y'].forEach(name => node.style.removeProperty(name));
+  }
+  reactiveStates.clear();
+}
+function paintFeedback() {
+  feedbackFrame = 0;
+  for (const [node, state] of reactiveStates) {
+    if (!state.dirty) continue;
+    state.dirty = false;
+    if (node.matches('[data-reactive-background]')) {
+      node.style.setProperty('--ambient-x', `${(state.x - .5) * 30}px`);
+      node.style.setProperty('--ambient-y', `${(state.y - .5) * 22}px`);
+      node.style.setProperty('--detail-x', `${(state.x - .5) * 8}px`);
+      node.style.setProperty('--detail-y', `${(state.y - .5) * 6}px`);
+    } else {
+      node.style.setProperty('--button-x', `${state.x * 100}%`);
+      node.style.setProperty('--button-y', `${state.y * 100}%`);
+    }
+  }
+}
+for (const node of reactiveSurfaces) {
+  const update = (x, y) => {
+    if (motionPreference.matches || !precisePointer.matches || document.hidden) return;
+    reactiveStates.set(node, { x, y, dirty: true });
+    if (!feedbackFrame) feedbackFrame = requestAnimationFrame(paintFeedback);
+  };
+  node.addEventListener('pointermove', event => {
+    if (motionPreference.matches || !precisePointer.matches) return;
+    const rect = node.getBoundingClientRect();
+    update(Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width)), Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height)));
+  }, { passive: true });
+  node.addEventListener('pointerleave', () => update(.5, .5), { passive: true });
+}
+motionPreference.addEventListener('change', () => { if (motionPreference.matches) clearFeedback(); });
+precisePointer.addEventListener('change', () => { if (!precisePointer.matches) clearFeedback(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) clearFeedback(); });

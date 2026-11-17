@@ -26,6 +26,25 @@ try {
     assert.equal(typography.headline.at(-1), '600');
     assert.ok(typography.fonts.some(face => face.family === 'Geist' && face.weight === '500' && face.status === 'loaded'));
     await page.waitForTimeout(1000);
+    const invitation = page.locator('.hero .primary');
+    assert.ok((await invitation.boundingBox()).height >= 60, 'main invitation has a prominent touch target');
+    if (width === 1440) {
+      const bounds = await invitation.boundingBox();
+      await page.mouse.move(bounds.x + 25, bounds.y + bounds.height / 2);
+      await page.waitForTimeout(120);
+      const firstLight = await invitation.evaluate(e => e.style.getPropertyValue('--button-x'));
+      await page.mouse.move(bounds.x + bounds.width - 35, bounds.y + bounds.height / 2);
+      await page.waitForTimeout(300);
+      assert.notEqual(await invitation.evaluate(e => e.style.getPropertyValue('--button-x')), firstLight, 'button highlight follows the pointer');
+      const hover = await invitation.evaluate(e => getComputedStyle(e).transform);
+      await page.mouse.down(); await page.waitForTimeout(280);
+      assert.notEqual(await invitation.evaluate(e => getComputedStyle(e).transform), hover, 'press provides distinct feedback');
+      await page.mouse.move(10, 10); await page.mouse.up();
+      await page.mouse.move(500, 230); await page.waitForTimeout(80);
+      const firstPosition = await page.locator('.hero').evaluate(e => e.style.getPropertyValue('--ambient-x'));
+      await page.mouse.move(1200, 280); await page.waitForTimeout(80);
+      assert.notEqual(await page.locator('.hero').evaluate(e => e.style.getPropertyValue('--ambient-x')), firstPosition, 'background responds to pointer position');
+    }
     assert.equal((await page.locator('h1').textContent()).replace(/\s+/g, ' ').trim(), 'AI for the trader');
     assert.equal(await page.locator('#strategy-field').count(), 1);
     assert.equal(await page.locator('.visual-emblem,.visual-node,.visual-connections,.visual-stage img[src*=prospect-mark]').count(), 0, 'hero contains no oversized brand badge or decorative pills');
@@ -66,13 +85,14 @@ try {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.waitForTimeout(200);
     await page.locator('.hero').scrollIntoViewIfNeeded(); await page.waitForTimeout(200);
+    assert.equal(await page.locator('.hero').evaluate(e => e.style.getPropertyValue('--ambient-x')), '', 'reduced motion clears reactive background position');
     const still = await pixels(); await page.waitForTimeout(300);
     assert.ok((await pixels()) === still, 'reduced-motion graphic stays static');
     await page.locator('[data-visual-step="0"]').click();
     assert.match(await page.locator('#workflow-note').textContent(), /question about the markets/);
     assert.equal(await page.evaluate(() => document.getAnimations().filter(a => a.playState === 'running').length), 0);
     assert.equal(errors.length, 0);
-    results.push({ width, typography, headline: 'AI for the trader', minimumHomepageText: '14px', reactiveGraphic: `${renderer}: three sculptural scenes, no hero logo; keyboard/offscreen/reduced motion verified`, rapidPreviewSelection: 'passed', keyboardDisclosure: 'passed', themeTransition: 'two switches complete with matching final palette', reducedMotion: 'static; no running animations', pageErrors: errors });
+    results.push({ width, typography, headline: 'AI for the trader', minimumHomepageText: '14px', reactiveGraphic: `${renderer}: three sculptural scenes, no hero logo; keyboard/offscreen/reduced motion verified`, rapidPreviewSelection: 'passed', keyboardDisclosure: 'passed', themeTransition: 'two switches complete with matching final palette', buttonFeedback: width === 1440 ? 'prominent target; pointer highlight and press feedback verified' : 'prominent touch target verified', backgroundFeedback: width === 1440 ? 'pointer response verified; reduced motion clears it' : 'reduced motion clears reactive position', reducedMotion: 'static; no running animations', pageErrors: errors });
     await page.close();
   }
   const defaultPage = await browser.newPage({ colorScheme: 'dark' });
