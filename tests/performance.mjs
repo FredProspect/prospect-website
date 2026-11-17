@@ -15,7 +15,7 @@ try {
   await page.goto('http://127.0.0.1:3199/', { waitUntil: 'networkidle' });
   const motion = await page.evaluate(() => new Promise(resolve => {
     const intervals = []; let previous;
-    function sample(time) { if (previous) intervals.push(time - previous); previous = time; if (intervals.length < 120) requestAnimationFrame(sample); else { const sorted = [...intervals].sort((a,b) => a-b); resolve({ samples: intervals.length, medianFrame_ms: sorted[60], p95Frame_ms: sorted[114], framesOver35ms: intervals.filter(t => t > 35).length, note: 'Local Chromium rAF sample during homepage interactions; not real-user FPS, battery or INP.' }); } }
+    function sample(time) { if (previous) intervals.push(time - previous); previous = time; if (intervals.length < 120) requestAnimationFrame(sample); else { const sorted = [...intervals].sort((a,b) => a-b); resolve({ renderer: document.querySelector('#strategy-field')?.dataset.renderer, samples: intervals.length, medianFrame_ms: sorted[60], p95Frame_ms: sorted[114], framesOver35ms: intervals.filter(t => t > 35).length, note: 'Local Chromium rAF sample during homepage interactions. Software-rendered browsers use composited sculpture artwork; not real-user hardware FPS, battery or INP.' }); } }
     requestAnimationFrame(sample);
   }));
   writeFileSync('evidence/motion.json', JSON.stringify(motion, null, 2));

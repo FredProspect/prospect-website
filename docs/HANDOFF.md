@@ -1,5 +1,23 @@
 # Prospect website — visual rebuild and release
 
+## Sculptural graphics refinement — 17 November 2026
+
+The oversized central Prospect mark, circular badge, floating pills and dashed hero connectors are removed. The hero now uses an original woven emerald sculpture: 24 rounded filaments form a trefoil, an ordered twisted band and three interacting loops. Native WebGL2 supplies depth testing, per-filament shading, directional reflections, subtle breathing and pointer-responsive perspective. Selecting a workflow step morphs the geometry and updates the explanatory text. The artwork is a concept illustration, with no market data or simulated results. “AI for the trader”, the bold self-hosted Geist typography and the light default are preserved.
+
+Software renderers and devices reporting at most 2 GB memory use transparent artwork captured from the exact same geometry, with inexpensive composited motion, pointer response and decoded scene transitions. Sustained slow frames also switch to that version. Reduced motion stops the ambient animation and makes deliberate scene changes static. Offscreen/hidden illustrations pause. Static artwork remains visible with scripting disabled; without WebGL, the scene buttons still work. The no-script scene controls are hidden. Theme treatment preserves the sculpture’s contrast. No rendering dependency or environment variable is added.
+
+The portfolio graphic now shows layered strategy flows merging into shared exposure; the intelligence section has a finely articulated ribbon. The opening graph-paper background is removed to give the sculpture and headline space. Approved brand lockups, authentic founder photo, genuine prototype captures, pre-launch disclosures and the persistent waitlist remain intact.
+
+Implementation: `scripts/pages.mjs`, `assets/refinement.css`, `assets/intelligence-visual.js` and three small `assets/intelligence-sculpture-*.webp` fallbacks. The homepage body changes; every generated route receives updated shared-asset cache versions. Rebuild with `npm run build`. To regenerate fallback artwork from the actual renderer, run `node scripts/capture-sculptures.mjs`, then build again. This local dev utility bypasses software detection for single static captures only; the public runtime keeps the performance safeguard.
+
+Verification: syntax, ESLint, production build, six integration tests and eight responsive/theme combinations pass. Axe reports zero violations. Browser tests cover the exact headline, absent hero logo, actual Geist fonts, minimum 14px text, theme persistence, keyboard scenes, preview/FAQ controls, offscreen pausing, reduced motion, static no-script artwork and functional no-WebGL scenes. Static WebGL geometry is exercised by the capture utility. The environment uses software rendering, so hardware GPU animation performance is not certified.
+
+Latest local Lighthouse: mobile **95 Performance / 100 Accessibility / 100 Best Practices / 100 SEO**; desktop **100 in all four categories**. Simulated LCP ~2.70s mobile / 0.56s desktop; TBT 110ms / 0ms; CLS 0 / <0.001. The mobile 2.5s LCP target remains unmet in this lab profile. A local compositor rAF sample has median 16.7ms, p95 16.8ms and no frames above 35ms. These are laboratory observations, not real-user Core Web Vitals, hardware frame-rate or battery measurements. Firefox/WebKit remain unavailable. Fresh screenshots, Lighthouse reports and a real browser walkthrough are in `evidence/`.
+
+Release uses the existing dedicated public website service and GitHub Pages publication. The trading services, database schema, stored registrations, consent wording, private volume, administrator export process and deployment variables are unchanged. No new production configuration is required. Verified contact destinations remain the founder email and Fred’s personal LinkedIn; the company LinkedIn URL remains unverified.
+
+_Earlier entries below document previous releases._
+
 ## Light-first, reactive product design — 17 November 2026
 
 Light mode is now the standard for visitors without an explicit preference, including devices using a dark OS theme. The theme button remains available and an explicit visitor choice persists. Automatic OS theme changes do not override that choice or the light default.
