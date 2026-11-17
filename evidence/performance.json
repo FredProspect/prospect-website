@@ -2,44 +2,44 @@
   {
     "device": "mobile",
     "scores": {
-      "performance": 100,
+      "performance": 95,
       "accessibility": 100,
       "best-practices": 100,
       "seo": 100
     },
-    "LCP_ms": 1141.0301,
-    "CLS": 0,
-    "TBT_ms": 63,
+    "LCP_ms": 2853.3458,
+    "CLS": 0.001387507398600101,
+    "TBT_ms": 68,
     "failedAudits": [
       {
-        "id": "first-contentful-paint",
-        "title": "First Contentful Paint",
-        "displayValue": "1.1 s"
+        "id": "largest-contentful-paint",
+        "title": "Largest Contentful Paint",
+        "displayValue": "2.9 s"
+      },
+      {
+        "id": "total-blocking-time",
+        "title": "Total Blocking Time",
+        "displayValue": "70 ms"
       },
       {
         "id": "max-potential-fid",
         "title": "Max Potential First Input Delay",
-        "displayValue": "150 ms"
+        "displayValue": "120 ms"
       },
       {
         "id": "interactive",
         "title": "Time to Interactive",
-        "displayValue": "2.0 s"
-      },
-      {
-        "id": "mainthread-work-breakdown",
-        "title": "Minimize main-thread work",
-        "displayValue": "2.5 s"
+        "displayValue": "2.9 s"
       },
       {
         "id": "cache-insight",
         "title": "Use efficient cache lifetimes",
-        "displayValue": "Est savings of 437 KiB"
+        "displayValue": "Est savings of 453 KiB"
       },
       {
         "id": "document-latency-insight",
         "title": "Document request latency",
-        "displayValue": "Est savings of 11 KiB"
+        "displayValue": "Est savings of 9 KiB"
       },
       {
         "id": "forced-reflow-insight",
@@ -48,7 +48,7 @@
       {
         "id": "image-delivery-insight",
         "title": "Improve image delivery",
-        "displayValue": "Est savings of 406 KiB"
+        "displayValue": "Est savings of 408 KiB"
       },
       {
         "id": "network-dependency-tree-insight",
@@ -57,7 +57,7 @@
       {
         "id": "render-blocking-insight",
         "title": "Render-blocking requests",
-        "displayValue": "Est savings of 150 ms"
+        "displayValue": "Est savings of 250 ms"
       }
     ]
   },
@@ -69,44 +69,24 @@
       "best-practices": 100,
       "seo": 100
     },
-    "LCP_ms": 1153.0113,
-    "CLS": 0.0001047921499536006,
-    "TBT_ms": 70.5,
+    "LCP_ms": 582.7633999999999,
+    "CLS": 0.0009971673026753852,
+    "TBT_ms": 0,
     "failedAudits": [
       {
-        "id": "first-contentful-paint",
-        "title": "First Contentful Paint",
-        "displayValue": "1.2 s"
-      },
-      {
-        "id": "total-blocking-time",
-        "title": "Total Blocking Time",
-        "displayValue": "70 ms"
-      },
-      {
-        "id": "max-potential-fid",
-        "title": "Max Potential First Input Delay",
-        "displayValue": "140 ms"
-      },
-      {
-        "id": "interactive",
-        "title": "Time to Interactive",
-        "displayValue": "2.2 s"
-      },
-      {
-        "id": "mainthread-work-breakdown",
-        "title": "Minimize main-thread work",
-        "displayValue": "2.5 s"
+        "id": "unused-css-rules",
+        "title": "Reduce unused CSS",
+        "displayValue": "Est savings of 13 KiB"
       },
       {
         "id": "cache-insight",
         "title": "Use efficient cache lifetimes",
-        "displayValue": "Est savings of 437 KiB"
+        "displayValue": "Est savings of 453 KiB"
       },
       {
         "id": "document-latency-insight",
         "title": "Document request latency",
-        "displayValue": "Est savings of 11 KiB"
+        "displayValue": "Est savings of 9 KiB"
       },
       {
         "id": "forced-reflow-insight",
@@ -115,7 +95,7 @@
       {
         "id": "image-delivery-insight",
         "title": "Improve image delivery",
-        "displayValue": "Est savings of 437 KiB"
+        "displayValue": "Est savings of 393 KiB"
       },
       {
         "id": "network-dependency-tree-insight",
@@ -124,7 +104,7 @@
       {
         "id": "render-blocking-insight",
         "title": "Render-blocking requests",
-        "displayValue": "Est savings of 150 ms"
+        "displayValue": "Est savings of 40 ms"
       }
     ]
   }

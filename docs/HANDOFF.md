@@ -1,5 +1,15 @@
 # Prospect website — visual rebuild and release
 
+## Trader-first editorial pass — 17 November 2026
+
+The homepage now says **AI for the trader**. The visual direction is deliberately simpler: bold solid Geist headlines, flat brand colours, larger reading text and a genuine product screenshot. The mathematical canvas, orbit/HUD composition, tiny section indices, glowing relationship diagrams, waveform decoration, portrait overlay stamp and oversized outline footer wordmark are removed from the rendered homepage. No background rendering script is shipped. Native preview transitions, keyboard-compatible FAQs and quieter control/theme feedback remain, with reduced-motion support.
+
+The hero explains the planned trading-research product directly. Pre-launch status, genuine prototype labelling, the founder portrait, consent/privacy information and risk disclosures remain intact and readable. Current homepage text is at least 14px; body copy is 18–20px on desktop and 17–18px on phones. Geist 400/500/600 remains self-hosted, with bold 600 headlines. The sharing artwork and page title use the same trader-first message.
+
+Eight viewport/theme combinations and six integration tests pass. Dedicated browser checks verify the exact headline, no leftover canvas/HUD/waveform elements, the 14px minimum, actual loaded Geist faces, preview selection, theme switching, keyboard disclosures and reduced-motion/no-JavaScript behaviour. The Lighthouse script now supplies its explicit desktop configuration rather than relying on a CLI-only preset flag. The hero preview is prioritised for discovery/loading. Latest lab scores: mobile Performance 95, desktop Performance 100; Accessibility, Best Practices and SEO 100 on both. Simulated LCP is 2.85s mobile and 0.58s desktop; field percentiles remain unmeasured. Full reports are in `evidence/`.
+
+The waitlist server, database, consent version, company destinations and trading application are unchanged. This is a public-site presentation/content update, released through the existing website service and GitHub Pages setup.
+
 ## Geist typography and motion refinement — 17 November 2026
 
 The current public refinement uses genuine locally hosted Geist Regular (400), Medium (500) and Semibold (600). The previous broad 600–900 declaration is corrected and synthetic font weights are disabled. Headlines now have deliberate weight contrast and line rhythm; paragraphs, labels, navigation, FAQs, consent text and disclosures have larger, clearer type, restrained tracking and comfortable line lengths. Responsive text remains readable at 320px and the hero CTA stays on the first screen. No claims, verified brand assets or founder information are changed.

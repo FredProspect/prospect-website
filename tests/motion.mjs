@@ -22,19 +22,15 @@ try {
     }));
     assert.match(typography.family, /Geist/);
     assert.ok(typography.weights.every(face => face.loaded));
-    assert.ok(typography.body >= 16);
+    assert.ok(typography.body >= 17);
     assert.equal(typography.headline.at(-1), '600');
     assert.ok(typography.fonts.some(face => face.family === 'Geist' && face.weight === '500' && face.status === 'loaded'));
-    await page.waitForTimeout(1200);
-    const pixels = () => page.locator('canvas').evaluate(e => e.toDataURL());
-    const active = await pixels();
-    await page.waitForTimeout(350);
-    assert.notEqual(await pixels(), active, 'visible canvas evolves');
+    await page.waitForTimeout(1000);
+    assert.equal((await page.locator('h1').textContent()).replace(/\s+/g, ' ').trim(), 'AI for the trader');
+    assert.equal(await page.locator('canvas,.instrument-label,.hero-coordinate,.intelligence-signal').count(), 0, 'decorative AI graphics and micro-labels removed');
+    const smallText = await page.locator('main').evaluate(main => [...main.querySelectorAll('*')].filter(node => [...node.childNodes].some(child => child.nodeType === 3 && child.textContent.trim())).filter(node => { const rect = node.getBoundingClientRect(); return rect.width > 0 && rect.height > 0 && parseFloat(getComputedStyle(node).fontSize) < 14; }).map(node => ({ tag: node.tagName, text: node.textContent.trim().slice(0, 50), size: getComputedStyle(node).fontSize })));
+    assert.deepEqual(smallText, [], 'homepage text remains at least 14px');
     await page.locator('#product').scrollIntoViewIfNeeded();
-    await page.waitForTimeout(650);
-    const paused = await pixels();
-    await page.waitForTimeout(350);
-    assert.equal(await pixels(), paused, 'offscreen canvas stops rendering');
     await page.locator('[data-preview=builder]').click();
     await page.locator('[data-preview=home]').click();
     await page.waitForFunction(() => document.querySelector('[data-preview=home]').getAttribute('aria-pressed') === 'true');
@@ -53,14 +49,10 @@ try {
     await page.waitForFunction(() => document.documentElement.dataset.theme === 'light');
     await page.waitForTimeout(650);
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.locator('.hero').scrollIntoViewIfNeeded();
     await page.waitForTimeout(200);
-    const reduced = await pixels();
-    await page.waitForTimeout(350);
-    assert.equal(await pixels(), reduced, 'reduced motion remains static');
     assert.equal(await page.evaluate(() => document.getAnimations().filter(a => a.playState === 'running').length), 0);
     assert.equal(errors.length, 0);
-    results.push({ width, typography, activeCanvas: 'animated', offscreenCanvas: 'paused', rapidPreviewSelection: 'passed', keyboardDisclosure: 'passed', themeTransition: 'two switches complete with matching final palette', reducedMotion: 'static; no running animations', pageErrors: errors });
+    results.push({ width, typography, headline: 'AI for the trader', minimumHomepageText: '14px', decorativeAiGraphics: 'removed', rapidPreviewSelection: 'passed', keyboardDisclosure: 'passed', themeTransition: 'two switches complete with matching final palette', reducedMotion: 'static; no running animations', pageErrors: errors });
     await page.close();
   }
   const noScript = await browser.newPage({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
@@ -69,5 +61,5 @@ try {
   assert.ok(await noScript.locator('.hero .primary').isVisible());
   await noScript.close();
   writeFileSync('evidence/typography-motion.json', JSON.stringify({ results, withoutJavaScript: 'headline and primary CTA visible' }, null, 2));
-  console.log('Real Geist 400/500/600 loaded; active/offscreen/reduced canvas, rapid preview changes, keyboard disclosures and no-JS content verified.');
+  console.log('Real Geist loaded; bold trader headline, minimum 14px homepage text, preview transitions, keyboard disclosures and reduced-motion/no-JS content verified.');
 } finally { await browser.close(); await new Promise(resolve => app.close(resolve)); }

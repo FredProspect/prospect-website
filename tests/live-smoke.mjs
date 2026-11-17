@@ -11,7 +11,7 @@ try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, colorScheme: 'dark', reducedMotion: 'reduce' });
   const visibleOrigin = process.env.SMOKE_PHASE === 'canonical-publication' ? 'https://prospectpartnership.co.uk' : api;
   await page.goto(visibleOrigin + '/?utm_source=controlled-release-smoke', { waitUntil: 'networkidle' });
-  assert.match(await page.locator('h1').textContent(), /A whole new/);
+  assert.match(await page.locator('h1').textContent(), /AI for.*the trader/);
   await page.locator('.portrait-frame img').scrollIntoViewIfNeeded();
   await page.waitForFunction(() => document.querySelector('.portrait-frame img').complete && document.querySelector('.portrait-frame img').naturalWidth > 0);
   assert.equal(await page.locator('.portrait-frame img').evaluate(e => e.complete && e.naturalWidth > 0), true);
@@ -24,7 +24,7 @@ try {
   result.collectorUi = 'passed';
   if (visibleOrigin !== api) result.canonicalUi = 'passed';
   await page.goto('https://prospectpartnership.co.uk/', { waitUntil: 'networkidle' });
-  result.canonicalContentUpdated = /A whole new/.test(await page.locator('h1').textContent());
+  result.canonicalContentUpdated = /AI for.*the trader/.test(await page.locator('h1').textContent());
   const cross = await page.evaluate(async endpoint => {
     const res = await fetch(endpoint + '/api/waitlist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: 'prospect-release-20261116@example.com', consent: true, source: 'controlled-release-smoke' }) });
     return { status: res.status, message: (await res.json()).message };
