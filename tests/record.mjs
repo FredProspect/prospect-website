@@ -13,10 +13,14 @@ try {
   await page.goto('http://127.0.0.1:3196/', { waitUntil: 'networkidle' });
   await page.locator('meta[name=waitlist-endpoint]').evaluate(e => e.content = '/api/waitlist');
   await page.waitForTimeout(1500);
+  await page.mouse.move(1210, 290);
+  await page.waitForTimeout(700);
+  await page.mouse.move(1000, 480);
+  await page.waitForTimeout(700);
   await page.locator('[data-visual-step="1"]').click();
-  await page.waitForTimeout(700);
+  await page.waitForTimeout(1800);
   await page.locator('[data-visual-step="2"]').click();
-  await page.waitForTimeout(700);
+  await page.waitForTimeout(1800);
   await page.locator('.hero .text-link').click();
   await page.waitForTimeout(1200);
   await page.locator('[data-preview=builder]').click();

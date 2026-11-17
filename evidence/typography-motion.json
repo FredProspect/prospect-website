@@ -43,7 +43,7 @@
       },
       "headline": "AI for the trader",
       "minimumHomepageText": "14px",
-      "reactiveGraphic": "three scenes, keyboard operable; offscreen/reduced motion verified",
+      "reactiveGraphic": "compositor: three sculptural scenes, no hero logo; keyboard/offscreen/reduced motion verified",
       "rapidPreviewSelection": "passed",
       "keyboardDisclosure": "passed",
       "themeTransition": "two switches complete with matching final palette",
@@ -93,7 +93,7 @@
       },
       "headline": "AI for the trader",
       "minimumHomepageText": "14px",
-      "reactiveGraphic": "three scenes, keyboard operable; offscreen/reduced motion verified",
+      "reactiveGraphic": "compositor: three sculptural scenes, no hero logo; keyboard/offscreen/reduced motion verified",
       "rapidPreviewSelection": "passed",
       "keyboardDisclosure": "passed",
       "themeTransition": "two switches complete with matching final palette",
@@ -101,5 +101,6 @@
       "pageErrors": []
     }
   ],
-  "withoutJavaScript": "headline and primary CTA visible"
+  "withoutJavaScript": "headline, primary CTA and static sculpture visible",
+  "withoutWebGL": "static scenes load and controls work"
 }

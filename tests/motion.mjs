@@ -28,8 +28,11 @@ try {
     await page.waitForTimeout(1000);
     assert.equal((await page.locator('h1').textContent()).replace(/\s+/g, ' ').trim(), 'AI for the trader');
     assert.equal(await page.locator('#strategy-field').count(), 1);
+    assert.equal(await page.locator('.visual-emblem,.visual-node,.visual-connections,.visual-stage img[src*=prospect-mark]').count(), 0, 'hero contains no oversized brand badge or decorative pills');
+    const renderer = await page.locator('#strategy-field').getAttribute('data-renderer');
+    assert.ok(['webgl2', 'compositor'].includes(renderer));
     assert.equal(await page.locator('.instrument-label,.hero-coordinate').count(), 0, 'small decorative labels remain removed');
-    const pixels = () => page.locator('#strategy-field').evaluate(e => e.toDataURL());
+    const pixels = () => renderer === 'webgl2' ? page.locator('#strategy-field').evaluate(e => e.toDataURL()) : page.locator('.sculpture-fallback').evaluate(e => getComputedStyle(e).transform);
     const moving = await pixels(); await page.waitForTimeout(350);
     assert.ok((await pixels()) !== moving, 'visible research graphic animates');
     await page.locator('[data-visual-step="1"]').focus(); await page.keyboard.press('Enter');
@@ -69,7 +72,7 @@ try {
     assert.match(await page.locator('#workflow-note').textContent(), /question about the markets/);
     assert.equal(await page.evaluate(() => document.getAnimations().filter(a => a.playState === 'running').length), 0);
     assert.equal(errors.length, 0);
-    results.push({ width, typography, headline: 'AI for the trader', minimumHomepageText: '14px', reactiveGraphic: 'three scenes, keyboard operable; offscreen/reduced motion verified', rapidPreviewSelection: 'passed', keyboardDisclosure: 'passed', themeTransition: 'two switches complete with matching final palette', reducedMotion: 'static; no running animations', pageErrors: errors });
+    results.push({ width, typography, headline: 'AI for the trader', minimumHomepageText: '14px', reactiveGraphic: `${renderer}: three sculptural scenes, no hero logo; keyboard/offscreen/reduced motion verified`, rapidPreviewSelection: 'passed', keyboardDisclosure: 'passed', themeTransition: 'two switches complete with matching final palette', reducedMotion: 'static; no running animations', pageErrors: errors });
     await page.close();
   }
   const defaultPage = await browser.newPage({ colorScheme: 'dark' });
@@ -84,7 +87,19 @@ try {
   await noScript.goto('http://127.0.0.1:3194/');
   assert.ok(await noScript.locator('h1').isVisible());
   assert.ok(await noScript.locator('.hero .primary').isVisible());
+  assert.ok(await noScript.locator('.sculpture-fallback').evaluate(e => e.complete && e.naturalWidth > 0), 'static sculpture is visible without scripting');
   await noScript.close();
-  writeFileSync('evidence/typography-motion.json', JSON.stringify({ results, withoutJavaScript: 'headline and primary CTA visible' }, null, 2));
+  const fallback = await browser.newPage();
+  await fallback.addInitScript(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function(type, ...args) { return type === 'webgl2' ? null : original.call(this, type, ...args); };
+  });
+  await fallback.goto('http://127.0.0.1:3194/', { waitUntil: 'networkidle' });
+  assert.equal(await fallback.locator('.visual-ready').count(), 0);
+  assert.ok(await fallback.locator('.sculpture-fallback').evaluate(e => e.complete && e.naturalWidth > 0));
+  await fallback.locator('[data-visual-step="2"]').click();
+  await fallback.waitForFunction(() => { const img = document.querySelector('.sculpture-fallback'); return img.src.endsWith('intelligence-sculpture-2.webp') && img.complete && img.naturalWidth > 0; });
+  await fallback.close();
+  writeFileSync('evidence/typography-motion.json', JSON.stringify({ results, withoutJavaScript: 'headline, primary CTA and static sculpture visible', withoutWebGL: 'static scenes load and controls work' }, null, 2));
   console.log('Real Geist loaded; bold trader headline, minimum 14px homepage text, light-first theme, reactive graphic, preview transitions, keyboard disclosures and reduced-motion/no-JS content verified.');
 } finally { await browser.close(); await new Promise(resolve => app.close(resolve)); }
