@@ -4,6 +4,7 @@ const visual = document.querySelector('.reactive-visual');
 if (visual) {
   const canvas = visual.querySelector('canvas');
   const stage = visual.querySelector('.visual-stage');
+  visual.querySelector('.workflow-controls').hidden = false;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
   const notes = [

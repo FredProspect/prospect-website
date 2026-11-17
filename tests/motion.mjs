@@ -86,6 +86,7 @@ try {
   const noScript = await browser.newPage({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
   await noScript.goto('http://127.0.0.1:3194/');
   assert.ok(await noScript.locator('h1').isVisible());
+  assert.equal(await noScript.locator('.workflow-controls').isVisible(), false, 'nonfunctional scene controls are hidden without scripting, including under the production CSP');
   assert.ok(await noScript.locator('.hero .primary').isVisible());
   assert.ok(await noScript.locator('.sculpture-fallback').evaluate(e => e.complete && e.naturalWidth > 0), 'static sculpture is visible without scripting');
   await noScript.close();
