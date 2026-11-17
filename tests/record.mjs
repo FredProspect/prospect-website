@@ -13,6 +13,8 @@ try {
   await page.goto('http://127.0.0.1:3196/', { waitUntil: 'networkidle' });
   await page.locator('meta[name=waitlist-endpoint]').evaluate(e => e.content = '/api/waitlist');
   await page.waitForTimeout(1500);
+  await page.locator('.hero .primary').hover();
+  await page.waitForTimeout(700);
   await page.mouse.move(1210, 290);
   await page.waitForTimeout(700);
   await page.mouse.move(1000, 480);

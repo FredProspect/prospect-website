@@ -240,3 +240,59 @@ html[data-theme=dark] .sculpture-fallback{filter:brightness(1.4) saturate(.9)}
  .exposure-strands,.workflow-ribbon path{animation:none!important}
  .demo:hover,.research-sheet:hover,.intelligence-flow>div:hover{transform:none;translate:none}
 }
+
+/* The launch invitation is the primary visual action throughout the site. */
+:root{--cta-top:#187951;--cta-bottom:#0b5139;--cta-ink:#fff;--cta-edge:#155e43;--cta-glow:#218a5230;--detail-dot:#3c7b5740;--ambient-light:#68c18c1c}
+html[data-theme=dark]{--cta-top:#baf4d1;--cta-bottom:#86dfb0;--cta-ink:#092b1c;--cta-edge:#9ae8bd;--cta-glow:#78e3a62b;--detail-dot:#90caa340;--ambient-light:#6cdf9320}
+.btn.primary{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(130deg,var(--cta-top),var(--cta-bottom));color:var(--cta-ink);border-color:var(--cta-edge);font-weight:600;box-shadow:0 4px 10px #0a392818,inset 0 1px 0 #ffffff29;transition:transform .25s var(--ease-out),box-shadow .35s,border-color .25s}
+.btn.primary::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at var(--button-x,50%) var(--button-y,0%),#ffffff14,transparent 70%);opacity:0;transition:opacity .3s}
+.btn.primary>span{display:grid;place-items:center;flex-shrink:0;width:30px;height:30px;border:1px solid currentColor;border-color:color-mix(in srgb,currentColor 20%,transparent);border-radius:50%;background:color-mix(in srgb,currentColor 9%,transparent);font-size:19px;line-height:1;transition:transform .35s var(--ease-out),background-color .25s}
+.hero .actions .primary{min-width:258px;min-height:68px;padding:12px 18px 12px 27px;gap:30px;justify-content:space-between;font-size:18px;box-shadow:0 10px 28px var(--cta-glow),inset 0 1px 0 #ffffff33}
+.hero .actions .primary>span{width:40px;height:40px;font-size:23px}
+.nav>.primary{min-height:52px;padding:10px 13px 10px 23px;gap:22px}
+.waitlist .submit{min-height:62px;justify-content:space-between;padding:12px 16px 12px 24px;font-size:18px;box-shadow:0 8px 24px var(--cta-glow),inset 0 1px 0 #ffffff33}
+.waitlist .submit>span{width:36px;height:36px;font-size:22px}
+.waitlist form{border-top:3px solid var(--accent)}
+.btn.primary:focus-visible{box-shadow:0 0 0 7px var(--cta-glow),0 10px 28px var(--cta-glow)}
+.btn.primary:focus-visible::before{opacity:.5}
+.btn.primary:active{transform:translateY(1px) scale(.98);box-shadow:0 2px 6px #0a392820,inset 0 2px 6px #0527191a}
+.btn:disabled{transform:none;box-shadow:none}
+.demo-tabs button,.workflow-controls button{transition:background-color .25s,color .25s,box-shadow .25s,transform .25s var(--ease-out)}
+.demo-tabs button:active,.workflow-controls button:active{transform:scale(.97)}
+@media(hover:hover) and (pointer:fine){
+ .btn.primary:hover{transform:translateY(-3px);box-shadow:0 0 0 4px var(--cta-glow),0 14px 32px var(--cta-glow),inset 0 1px 0 #ffffff4d}
+ .btn.primary:hover::before{opacity:1}
+ .btn.primary:hover>span{transform:translateX(3px);background:color-mix(in srgb,currentColor 15%,transparent)}
+ .btn.primary:active{transform:translateY(1px) scale(.98);box-shadow:0 2px 6px #0a392820}
+ .demo-tabs button:hover,.workflow-controls button:hover{box-shadow:inset 0 0 0 1px var(--line);background-color:var(--wash);transform:translateY(-1px)}
+ .demo-tabs button[aria-pressed=true]:hover{background:var(--accent);color:var(--on)}
+ .navlinks a{position:relative;transition:color .2s}
+ .navlinks a::after{content:'';position:absolute;bottom:-5px;left:0;right:0;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s var(--ease-out)}
+ .navlinks a:hover::after,.navlinks a:focus-visible::after{transform:scaleX(1)}
+}
+/* Quiet detail has a bounded, local response and never captures pointer input. */
+.hero::before,.waitlist::before{display:block;content:'';position:absolute;inset:-18px;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 70% 35%,var(--ambient-light),transparent 58%);transform:translate3d(var(--ambient-x,0px),var(--ambient-y,0px),0)}
+.hero::after,.waitlist::after{display:block;content:'';position:absolute;inset:-12px;z-index:-1;pointer-events:none;background-image:radial-gradient(circle,var(--detail-dot) .75px,transparent 1px);background-size:24px 24px;mask-image:linear-gradient(100deg,transparent 20%,#000 85%);transform:translate3d(var(--detail-x,0px),var(--detail-y,0px),0)}
+.waitlist{overflow:hidden}
+.waitlist::before{background:radial-gradient(ellipse at 18% 60%,var(--ambient-light),transparent 65%)}
+.waitlist::after{mask-image:linear-gradient(100deg,#000,transparent 70%)}
+.waitlist:target form{animation:waitlist-arrival 1s var(--ease-out)}
+@keyframes waitlist-arrival{0%{box-shadow:0 0 0 0 var(--cta-glow)}40%{box-shadow:0 0 0 9px var(--cta-glow),0 18px 60px #174e2815}100%{box-shadow:0 0 0 0 transparent,0 18px 60px #174e2815}}
+@media(max-width:1100px) and (min-width:721px){.nav>.primary{gap:14px;padding-inline:16px}.hero .actions .primary{min-width:238px;font-size:17px}.hero .actions{gap:20px}}
+@media(max-width:720px){
+ .hero .actions .primary{width:100%;min-height:62px;font-size:18px;padding-inline:24px 15px}
+ .hero .actions{gap:17px}.hero .actions .text-link{margin-left:2px}
+ .nav>.primary{min-height:46px;padding:9px 10px 9px 14px;gap:12px}
+ .nav>.primary>span{width:25px;height:25px;font-size:17px}
+ .hero::after,.waitlist::after{background-size:22px 22px;opacity:.7}
+ .waitlist .submit{font-size:17px;min-height:60px;padding-inline:19px 12px}
+}
+@media(max-width:360px){.nav>.primary{padding-inline:9px;gap:7px}.nav>.primary>span{width:21px;height:21px;font-size:16px}.hero .actions .primary{min-height:60px;font-size:17px}}
+@media(prefers-reduced-motion:reduce){
+ .hero::before,.hero::after,.waitlist::before,.waitlist::after{transform:none}
+ .btn.primary:hover,.btn.primary:active,.btn.primary:hover>span,.demo-tabs button:hover,.workflow-controls button:hover,.demo-tabs button:active,.workflow-controls button:active{transform:none}
+}
+.btn.primary:disabled,.btn.primary:disabled:hover{transform:none;box-shadow:none;cursor:wait}
+/* Keep the enlarged invitation on the first screen of shorter laptops. */
+@media(min-width:1101px) and (max-height:820px){.hero{padding-top:48px;padding-bottom:60px}.visual-stage{height:390px}}
+@media(min-width:1101px) and (max-height:700px){.hero{padding-top:16px;padding-bottom:45px}.hero h1{font-size:115px}.visual-stage{height:330px}}

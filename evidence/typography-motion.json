@@ -47,6 +47,8 @@
       "rapidPreviewSelection": "passed",
       "keyboardDisclosure": "passed",
       "themeTransition": "two switches complete with matching final palette",
+      "buttonFeedback": "prominent target; pointer highlight and press feedback verified",
+      "backgroundFeedback": "pointer response verified; reduced motion clears it",
       "reducedMotion": "static; no running animations",
       "pageErrors": []
     },
@@ -97,6 +99,8 @@
       "rapidPreviewSelection": "passed",
       "keyboardDisclosure": "passed",
       "themeTransition": "two switches complete with matching final palette",
+      "buttonFeedback": "prominent touch target verified",
+      "backgroundFeedback": "reduced motion clears reactive position",
       "reducedMotion": "static; no running animations",
       "pageErrors": []
     }
