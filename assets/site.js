@@ -26,7 +26,7 @@ themeButton?.addEventListener('click', () => {
 });
 preference.addEventListener('change', () => { if (!saved) setTheme(preference.matches ? 'dark' : 'light'); });
 const previews = {
-  home: { image: 'workspace.jpg', height: 971, alt: 'Prospect prototype home. Create or import a strategy, with no portfolio connected.', title: 'A workspace for what’s next.', copy: 'Start with a strategy idea or bring existing research. This is a genuine prototype capture with no account connected, no holdings and no performance claims.' },
+  home: { image: 'workspace.jpg', height: 971, alt: 'Prospect prototype home. Create or import a strategy, with no portfolio connected.', title: 'A workspace for what’s next.', copy: 'Start with a strategy idea or bring your existing research. This is a prototype preview, not the released product.' },
   builder: { image: 'strategy-builder.jpg', height: 922, alt: 'Prospect Strategy Builder prototype: describe, understand, prepare, review, continue. The screen states AI drafting is not connected.', title: 'One thought is enough.', copy: 'The prototype builder begins with your idea, then guides you through a structured workflow. AI drafting is not connected in this captured version. This preview does not run a strategy or produce test results.' }
 };
 let previewRequest = 0;

@@ -1,7 +1,7 @@
 // Progressive enhancement: content is visible and usable before any animation.
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
 const runningAnimations = new Set();
-function enter(node, delay = 0, distance = 22, duration = 850, fade = true) {
+function enter(node, delay = 0, distance = 12, duration = 550, fade = true) {
   if (motionPreference.matches || !node) return;
   const animation = node.animate([
     { opacity: fade ? 0 : 1, translate: `0 ${distance}px` },
@@ -14,12 +14,12 @@ function enter(node, delay = 0, distance = 22, duration = 850, fade = true) {
 }
 const hero = document.querySelector('.hero');
 if (hero && hero.getBoundingClientRect().bottom > 0) {
-  enter(hero.querySelector('.eyebrow'), 0, 10, 650);
+  enter(hero.querySelector('.availability'), 0, 8, 500);
   hero.querySelectorAll('.headline-line').forEach((line, index) => enter(line, index * 70, 19, 850, false));
   enter(hero.querySelector('.lede'), 100, 12, 750, false);
-  enter(hero.querySelector('.actions'), 350, 12, 850);
+  enter(hero.querySelector('.actions'), 60, 8, 500, false);
   enter(hero.querySelector('.fine'), 410, 8, 800);
-  enter(hero.querySelector('.hero-art'), 200, 16, 1200);
+  enter(hero.querySelector('.hero-preview'), 80, 10, 600, false);
 }
 // Observe small, independent surfaces so a whole section never disappears.
 const revealObserver = new IntersectionObserver(entries => {
@@ -32,16 +32,6 @@ const revealObserver = new IntersectionObserver(entries => {
   }
 }, { threshold: .13 });
 document.querySelectorAll('.section-head,.chapter > div,.founder-copy,.founder-portrait,.waitlist-grid > div,.waitlist-grid > form').forEach(node => revealObserver.observe(node));
-// Native SVG/CSS loops only consume animation work while visible.
-const loopObserver = new IntersectionObserver(entries => {
-  for (const entry of entries) entry.target.classList.toggle('is-inview', entry.isIntersecting && !document.hidden);
-}, { threshold: .05 });
-const loopSurfaces = [...document.querySelectorAll('.hero-art,.risk-visual,.intelligence-signal')];
-loopSurfaces.forEach(node => loopObserver.observe(node));
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) loopSurfaces.forEach(node => node.classList.remove('is-inview'));
-  else loopSurfaces.forEach(node => { const rect = node.getBoundingClientRect(); node.classList.toggle('is-inview', rect.bottom > 0 && rect.top < innerHeight); });
-});
 // Keep native details semantics, with a measured height transition on activation.
 const disclosureAnimations = new Map();
 for (const details of document.querySelectorAll('.faq details')) {

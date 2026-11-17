@@ -1,4 +1,5 @@
 import lighthouse from 'lighthouse';
+import desktopConfig from 'lighthouse/core/config/desktop-config.js';
 import { launch } from 'chrome-launcher';
 import { chromium } from '@playwright/test';
 import { writeFileSync } from 'node:fs';
@@ -14,7 +15,7 @@ try {
   await page.goto('http://127.0.0.1:3199/', { waitUntil: 'networkidle' });
   const motion = await page.evaluate(() => new Promise(resolve => {
     const intervals = []; let previous;
-    function sample(time) { if (previous) intervals.push(time - previous); previous = time; if (intervals.length < 120) requestAnimationFrame(sample); else { const sorted = [...intervals].sort((a,b) => a-b); resolve({ samples: intervals.length, medianFrame_ms: sorted[60], p95Frame_ms: sorted[114], framesOver35ms: intervals.filter(t => t > 35).length, note: 'Local Chromium rAF sample during hero animation; not real-user FPS, battery or INP.' }); } }
+    function sample(time) { if (previous) intervals.push(time - previous); previous = time; if (intervals.length < 120) requestAnimationFrame(sample); else { const sorted = [...intervals].sort((a,b) => a-b); resolve({ samples: intervals.length, medianFrame_ms: sorted[60], p95Frame_ms: sorted[114], framesOver35ms: intervals.filter(t => t > 35).length, note: 'Local Chromium rAF sample during homepage interactions; not real-user FPS, battery or INP.' }); } }
     requestAnimationFrame(sample);
   }));
   writeFileSync('evidence/motion.json', JSON.stringify(motion, null, 2));
@@ -22,7 +23,7 @@ try {
   for (const device of ['mobile', 'desktop']) {
     const chrome = await launch({ chromePath: '/usr/bin/chromium', chromeFlags: ['--headless', '--no-sandbox', '--disable-dev-shm-usage'] });
     try {
-      const result = await lighthouse('http://127.0.0.1:3199/', { port: chrome.port, output: 'html', logLevel: 'error', onlyCategories: ['performance', 'accessibility', 'best-practices', 'seo'], ...(device === 'desktop' ? { preset: 'desktop' } : {}) });
+      const result = await lighthouse('http://127.0.0.1:3199/', { port: chrome.port, output: 'html', logLevel: 'error', onlyCategories: ['performance', 'accessibility', 'best-practices', 'seo'] }, device === 'desktop' ? desktopConfig : undefined);
       writeFileSync(`evidence/lighthouse-${device}.html`, result.report);
       const audits = result.lhr.audits;
       results.push({ device, scores: Object.fromEntries(Object.entries(result.lhr.categories).map(([key, value]) => [key, Math.round(value.score * 100)])), LCP_ms: audits['largest-contentful-paint'].numericValue, CLS: audits['cumulative-layout-shift'].numericValue, TBT_ms: audits['total-blocking-time'].numericValue, failedAudits: Object.entries(audits).filter(([_key, value]) => value.score !== null && value.score < 1 && value.scoreDisplayMode !== 'informative').map(([key, value]) => ({ id: key, title: value.title, displayValue: value.displayValue })) });

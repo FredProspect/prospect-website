@@ -18,10 +18,9 @@
             "loaded": true
           }
         ],
-        "body": 17,
+        "body": 18,
         "headline": [
-          "400",
-          "400",
+          "600",
           "600"
         ],
         "fonts": [
@@ -42,8 +41,9 @@
           }
         ]
       },
-      "activeCanvas": "animated",
-      "offscreenCanvas": "paused",
+      "headline": "AI for the trader",
+      "minimumHomepageText": "14px",
+      "decorativeAiGraphics": "removed",
       "rapidPreviewSelection": "passed",
       "keyboardDisclosure": "passed",
       "themeTransition": "two switches complete with matching final palette",
@@ -68,10 +68,9 @@
             "loaded": true
           }
         ],
-        "body": 16,
+        "body": 17,
         "headline": [
-          "400",
-          "400",
+          "600",
           "600"
         ],
         "fonts": [
@@ -92,8 +91,9 @@
           }
         ]
       },
-      "activeCanvas": "animated",
-      "offscreenCanvas": "paused",
+      "headline": "AI for the trader",
+      "minimumHomepageText": "14px",
+      "decorativeAiGraphics": "removed",
       "rapidPreviewSelection": "passed",
       "keyboardDisclosure": "passed",
       "themeTransition": "two switches complete with matching final palette",
