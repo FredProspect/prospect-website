@@ -8,28 +8,65 @@ function setTheme(theme) {
 let saved;
 try { saved = localStorage.getItem('prospect-theme'); } catch { /* Storage is optional. */ }
 setTheme(saved === 'light' || saved === 'dark' ? saved : preference.matches ? 'dark' : 'light');
+let themeTimer;
 themeButton?.addEventListener('click', () => {
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.documentElement.classList.add('theme-shifting');
+    clearTimeout(themeTimer);
+    themeTimer = setTimeout(() => document.documentElement.classList.remove('theme-shifting'), 400);
+  }
   saved = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
   setTheme(saved);
   try { localStorage.setItem('prospect-theme', saved); } catch { /* Preference only, never lead data. */ }
 });
 preference.addEventListener('change', () => { if (!saved) setTheme(preference.matches ? 'dark' : 'light'); });
 const previews = {
-  home: { image: 'workspace.jpg', height: 971, alt: 'Prospect prototype home. Create or import a strategy, with no portfolio connected.', title: 'A clear place to begin.', copy: 'Start with a strategy idea or bring existing research. This is a genuine prototype capture with no account connected, no holdings and no performance claims.' },
+  home: { image: 'workspace.jpg', height: 971, alt: 'Prospect prototype home. Create or import a strategy, with no portfolio connected.', title: 'A workspace for what’s next.', copy: 'Start with a strategy idea or bring existing research. This is a genuine prototype capture with no account connected, no holdings and no performance claims.' },
   builder: { image: 'strategy-builder.jpg', height: 922, alt: 'Prospect Strategy Builder prototype: describe, understand, prepare, review, continue. The screen states AI drafting is not connected.', title: 'One thought is enough.', copy: 'The prototype builder begins with your idea, then guides you through a structured workflow. AI drafting is not connected in this captured version. This preview does not run a strategy or produce test results.' }
 };
-for (const button of document.querySelectorAll('[data-preview]')) button.addEventListener('click', () => {
+let previewRequest = 0;
+let previewAnimations = [];
+const previewMotion = matchMedia('(prefers-reduced-motion: reduce)');
+function clearPreviewMotion() {
+  previewAnimations.forEach(animation => animation.cancel());
+  previewAnimations = [];
+  document.querySelectorAll('.preview-outgoing').forEach(node => node.remove());
+}
+previewMotion.addEventListener('change', () => { if (previewMotion.matches) clearPreviewMotion(); });
+for (const button of document.querySelectorAll('[data-preview]')) button.addEventListener('click', async () => {
+  const request = ++previewRequest;
   const preview = previews[button.dataset.preview];
   const image = document.querySelector('#product-screen');
-  image.src = `/assets/product/${preview.image}`;
-  // Fixed aspect ratio prevents layout shift when switching screens.
+  const stage = document.querySelector('.demo');
+  stage.setAttribute('aria-busy', 'true');
+  const next = new Image();
+  next.src = `/assets/product/${preview.image}`;
+  try { await next.decode(); }
+  catch { if (request === previewRequest) { stage.removeAttribute('aria-busy'); document.querySelector('#preview-copy').textContent = 'This preview could not load. Please try again.'; } return; }
+  if (request !== previewRequest) return;
+  clearPreviewMotion();
+  if (!previewMotion.matches && image.src !== next.src) {
+    const previous = image.cloneNode();
+    previous.removeAttribute('id'); previous.alt = ''; previous.setAttribute('aria-hidden', 'true');
+    previous.className = 'preview-outgoing';
+    previous.style.top = `${image.offsetTop}px`;
+    previous.style.left = `${image.offsetLeft}px`;
+    previous.style.width = `${image.offsetWidth}px`;
+    previous.style.height = `${image.offsetHeight}px`;
+    stage.append(previous);
+    const exit = previous.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 420, easing: 'ease-out', fill: 'forwards' });
+    exit.addEventListener('finish', () => previous.remove(), { once: true });
+    previewAnimations.push(exit);
+    previewAnimations.push(image.animate([{ opacity: .3, transform: 'translateY(10px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 650, easing: 'cubic-bezier(.16,1,.3,1)' }));
+  }
+  image.src = next.src;
   image.style.aspectRatio = '1440 / 971';
   image.style.objectFit = 'contain';
   image.alt = preview.alt;
-  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) image.animate([{ opacity: .45, transform: 'translateY(7px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)' });
   document.querySelector('#preview-title').textContent = preview.title;
   document.querySelector('#preview-copy').textContent = preview.copy;
   document.querySelectorAll('[data-preview]').forEach(other => other.setAttribute('aria-pressed', String(other === button)));
+  stage.removeAttribute('aria-busy');
 });
 const form = document.querySelector('#waitlist-form');
 form?.addEventListener('submit', async event => {

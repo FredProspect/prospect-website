@@ -7,9 +7,9 @@
       "best-practices": 100,
       "seo": 100
     },
-    "LCP_ms": 1146.5211,
+    "LCP_ms": 1141.0301,
     "CLS": 0,
-    "TBT_ms": 32,
+    "TBT_ms": 63,
     "failedAudits": [
       {
         "id": "first-contentful-paint",
@@ -19,12 +19,22 @@
       {
         "id": "max-potential-fid",
         "title": "Max Potential First Input Delay",
-        "displayValue": "110 ms"
+        "displayValue": "150 ms"
+      },
+      {
+        "id": "interactive",
+        "title": "Time to Interactive",
+        "displayValue": "2.0 s"
+      },
+      {
+        "id": "mainthread-work-breakdown",
+        "title": "Minimize main-thread work",
+        "displayValue": "2.5 s"
       },
       {
         "id": "cache-insight",
         "title": "Use efficient cache lifetimes",
-        "displayValue": "Est savings of 411 KiB"
+        "displayValue": "Est savings of 437 KiB"
       },
       {
         "id": "document-latency-insight",
@@ -59,24 +69,39 @@
       "best-practices": 100,
       "seo": 100
     },
-    "LCP_ms": 1148.378,
-    "CLS": 0,
-    "TBT_ms": 25,
+    "LCP_ms": 1153.0113,
+    "CLS": 0.0001047921499536006,
+    "TBT_ms": 70.5,
     "failedAudits": [
       {
         "id": "first-contentful-paint",
         "title": "First Contentful Paint",
-        "displayValue": "1.1 s"
+        "displayValue": "1.2 s"
+      },
+      {
+        "id": "total-blocking-time",
+        "title": "Total Blocking Time",
+        "displayValue": "70 ms"
       },
       {
         "id": "max-potential-fid",
         "title": "Max Potential First Input Delay",
-        "displayValue": "100 ms"
+        "displayValue": "140 ms"
+      },
+      {
+        "id": "interactive",
+        "title": "Time to Interactive",
+        "displayValue": "2.2 s"
+      },
+      {
+        "id": "mainthread-work-breakdown",
+        "title": "Minimize main-thread work",
+        "displayValue": "2.5 s"
       },
       {
         "id": "cache-insight",
         "title": "Use efficient cache lifetimes",
-        "displayValue": "Est savings of 411 KiB"
+        "displayValue": "Est savings of 437 KiB"
       },
       {
         "id": "document-latency-insight",
@@ -90,7 +115,7 @@
       {
         "id": "image-delivery-insight",
         "title": "Improve image delivery",
-        "displayValue": "Est savings of 406 KiB"
+        "displayValue": "Est savings of 437 KiB"
       },
       {
         "id": "network-dependency-tree-insight",

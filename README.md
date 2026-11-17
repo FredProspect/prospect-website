@@ -24,6 +24,7 @@ npm run lint
 npm run build
 npm test
 npm run test:browser
+npm run test:motion
 node tests/performance.mjs
 ```
 

@@ -38,9 +38,10 @@ try {
       const cta = await page.locator('.hero .primary').boundingBox();
       assert.ok(cta.y >= 0 && cta.y + cta.height <= height, `${width}: hero CTA visible`);
       await page.locator('[data-preview=builder]').click();
-      await page.waitForFunction(() => document.querySelector('#product-screen').complete);
+      await page.waitForFunction(() => document.querySelector('[data-preview=builder]').getAttribute('aria-pressed') === 'true' && document.querySelector('#product-screen').complete);
       assert.equal(await page.locator('[data-preview=builder]').getAttribute('aria-pressed'), 'true');
       await page.locator('[data-preview=home]').click();
+      await page.waitForFunction(() => document.querySelector('[data-preview=home]').getAttribute('aria-pressed') === 'true');
       const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze();
       results.push({ device, width, theme, violations: axe.violations.map(v => ({ id: v.id, impact: v.impact, nodes: v.nodes.map(n => n.target) })), pageErrors: errors });
       await page.evaluate(() => { document.activeElement.blur(); window.scrollTo(0, 0); });
