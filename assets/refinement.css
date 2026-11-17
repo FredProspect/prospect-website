@@ -188,6 +188,7 @@ html[data-theme=dark]{--visual-line:#8ce8b4;--visual-mint:#173b28;--visual-paper
 .sculpture-fallback{transition:opacity .2s}
 .visual-ready .sculpture-fallback{opacity:0}
 html[data-theme=dark] .sculpture-fallback{filter:brightness(1.4) saturate(.9)}
+.workflow-controls[hidden]{visibility:hidden}
 .workflow-controls{display:flex;gap:6px;padding:6px;border:1px solid var(--line);border-radius:9px;background:var(--surface);margin-top:12px;position:relative;z-index:4}
 .workflow-controls button{flex:1;min-height:46px;padding:10px 8px;border:0;border-radius:5px;background:none;color:var(--muted);font-size:15px;font-weight:500;line-height:1.4;transition:background-color .3s,color .3s}
 .workflow-controls button[aria-pressed=true]{background:var(--wash);color:var(--ink)}
