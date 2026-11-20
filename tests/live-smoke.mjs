@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 if (process.env.RUN_LIVE_SMOKE !== '1') throw Error('Set RUN_LIVE_SMOKE=1 explicitly for a release check.');
 const api = 'https://prospect-public-website-staging.up.railway.app';
-const browser = await chromium.launch({ executablePath: '/usr/bin/chromium', args: ['--no-sandbox'] });
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', args: ['--no-sandbox'] });
 const result = { checkedAt: new Date().toISOString(), phase: process.env.SMOKE_PHASE || 'release', collector: api };
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, colorScheme: 'dark', reducedMotion: 'reduce' });
@@ -16,9 +16,9 @@ try {
   await page.waitForFunction(() => document.querySelector('.portrait-frame img').complete && document.querySelector('.portrait-frame img').naturalWidth > 0);
   assert.equal(await page.locator('.portrait-frame img').evaluate(e => e.complete && e.naturalWidth > 0), true);
   await page.locator('#email').fill('prospect-release-20261116@example.com');
-  await page.locator('[name=consent]').check();
+  await page.locator('#consent').check();
   const saved = page.waitForResponse(r => r.url().endsWith('/api/waitlist') && r.request().method() === 'POST');
-  await page.locator('.submit').click();
+  await page.locator('#waitlist-form .submit').click();
   assert.equal((await saved).status(), 200);
   await page.waitForFunction(() => document.querySelector('#form-status').textContent.startsWith('You’re on the list.'));
   result.collectorUi = 'passed';

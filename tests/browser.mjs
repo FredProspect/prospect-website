@@ -9,7 +9,7 @@ const folder = mkdtempSync(join(tmpdir(), 'prospect-browser-'));
 const app = createApp({ origin: 'http://127.0.0.1:3198', dbPath: join(folder, 'leads.sqlite'), secret: 'controlled-browser-test-secret-over-32-characters' });
 await new Promise(resolve => app.listen(3198, '127.0.0.1', resolve));
 mkdirSync('evidence', { recursive: true });
-const browser = await chromium.launch({ executablePath: '/usr/bin/chromium', headless: true, args: ['--no-sandbox'] });
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox'] });
 const results = [];
 const crossEngine = [];
 for (const [name, engine] of [['firefox', firefox], ['webkit', webkit]]) {
@@ -33,10 +33,10 @@ try {
       await page.locator('#email').fill('invalid');
       assert.equal(await page.locator('#email').evaluate(e => e.validity.valid), false);
       await page.locator('#email').fill('');
-      assert.equal(await page.locator('[name=consent]').evaluate(e => e.validity.valueMissing), true);
+      assert.equal(await page.locator('#consent').evaluate(e => e.validity.valueMissing), true);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${width}: overflow`);
       await page.evaluate(() => { document.activeElement.blur(); window.scrollTo(0, 0); });
-      const cta = await page.locator('.hero .primary').boundingBox();
+      const cta = await page.locator('.hero .submit').boundingBox();
       assert.ok(cta.y >= 0 && cta.y + cta.height <= height, `${width}: hero CTA visible`);
       await page.locator('[data-preview=builder]').click();
       await page.waitForFunction(() => document.querySelector('[data-preview=builder]').getAttribute('aria-pressed') === 'true' && document.querySelector('#product-screen').complete);
@@ -53,8 +53,8 @@ try {
       await page.locator('.theme').click();
       assert.notEqual(await page.locator('html').getAttribute('data-theme'), theme);
       await page.locator('#email').fill(`${device}-${theme}@example.com`);
-      await page.locator('[name=consent]').check();
-      await page.locator('.submit').click();
+      await page.locator('#consent').check();
+      await page.locator('#waitlist-form .submit').click();
       await page.waitForFunction(() => document.querySelector('#form-status').textContent.startsWith('You’re on the list.'));
       await page.keyboard.press('Tab');
       await context.close();
@@ -69,8 +69,8 @@ try {
     await page.goto('http://127.0.0.1:3197/');
     await page.locator('meta[name=waitlist-endpoint]').evaluate(e => e.content = '/api/waitlist');
     await page.locator('#email').fill('failure@example.com');
-    await page.locator('[name=consent]').check();
-    await page.locator('.submit').click();
+    await page.locator('#consent').check();
+    await page.locator('#waitlist-form .submit').click();
     await page.waitForFunction(() => document.querySelector('#form-status').classList.contains('error'));
     assert.match(await page.locator('#form-status').textContent(), /temporarily unavailable/);
     await page.close();

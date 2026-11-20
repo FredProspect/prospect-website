@@ -4,7 +4,7 @@ import { writeFileSync } from 'node:fs';
 import { createApp } from '../server.mjs';
 const app = createApp();
 await new Promise(resolve => app.listen(3194, '127.0.0.1', resolve));
-const browser = await chromium.launch({ executablePath: '/usr/bin/chromium', args: ['--no-sandbox'] });
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', args: ['--no-sandbox'] });
 const results = [];
 try {
   for (const width of [1440, 390]) {
@@ -15,112 +15,82 @@ try {
     await page.evaluate(async () => { await Promise.all([400, 500, 600].map(weight => document.fonts.load(`${weight} 32px Geist`))); });
     const typography = await page.evaluate(() => ({
       family: getComputedStyle(document.body).fontFamily,
-      weights: [400, 500, 600].map(weight => ({ weight, loaded: document.fonts.check(`${weight} 32px Geist`) })),
-      body: parseFloat(getComputedStyle(document.querySelector('.chapter p')).fontSize),
-      headline: [...document.querySelectorAll('.headline-line')].map(e => getComputedStyle(e).fontWeight),
-      fonts: [...document.fonts].map(font => ({ family: font.family, weight: font.weight, status: font.status }))
+      weights: [400, 500, 600].map(weight => document.fonts.check(`${weight} 32px Geist`)),
+      body: parseFloat(getComputedStyle(document.querySelector('.step-copy p:not(.kicker):not(.status-chip)')).fontSize),
+      headline: getComputedStyle(document.querySelector('h1')).fontWeight
     }));
     assert.match(typography.family, /Geist/);
-    assert.ok(typography.weights.every(face => face.loaded));
+    assert.ok(typography.weights.every(Boolean), 'Geist 400/500/600 load locally');
     assert.ok(typography.body >= 17);
-    assert.equal(typography.headline.at(-1), '600');
-    assert.ok(typography.fonts.some(face => face.family === 'Geist' && face.weight === '500' && face.status === 'loaded'));
-    await page.waitForTimeout(1000);
-    const invitation = page.locator('.hero .primary');
-    assert.ok((await invitation.boundingBox()).height >= 60, 'main invitation has a prominent touch target');
+    assert.equal(typography.headline, '600');
+    assert.equal((await page.locator('h1').textContent()).replace(/\s+/g, ' ').trim(), 'AI for the trader.');
+
+    // The waitlist leads: the hero form and its submit button are on the first screen.
+    const submit = await page.locator('#waitlist-form .submit').boundingBox();
+    assert.ok(submit.height >= 48 && submit.y + submit.height <= (width === 1440 ? 1000 : 844), 'hero signup visible without scrolling');
+
+    // Decision architecture draws once, then rests in its complete state.
+    await page.waitForTimeout(2600);
+    const architecture = await page.locator('[data-arch] svg').evaluate(svg => ({
+      inputs: svg.querySelectorAll('.g-in').length,
+      running: svg.getAnimations({ subtree: true }).filter(a => a.playState === 'running').length,
+      aiOffset: getComputedStyle(svg.querySelector('.g-ai')).strokeDashoffset,
+      portfolio: getComputedStyle(svg.querySelector('.n-port')).opacity
+    }));
+    assert.ok(architecture.inputs >= 30);
+    assert.equal(architecture.running, 0, 'no perpetual loops');
+    assert.match(architecture.aiOffset, /^0(px)?$/);
+    assert.equal(architecture.portfolio, '1');
     if (width === 1440) {
-      const bounds = await invitation.boundingBox();
-      await page.mouse.move(bounds.x + 25, bounds.y + bounds.height / 2);
-      await page.waitForTimeout(120);
-      const firstLight = await invitation.evaluate(e => e.style.getPropertyValue('--button-x'));
-      await page.mouse.move(bounds.x + bounds.width - 35, bounds.y + bounds.height / 2);
-      await page.waitForTimeout(300);
-      assert.notEqual(await invitation.evaluate(e => e.style.getPropertyValue('--button-x')), firstLight, 'button highlight follows the pointer');
-      const hover = await invitation.evaluate(e => getComputedStyle(e).transform);
-      await page.mouse.down(); await page.waitForTimeout(280);
-      assert.notEqual(await invitation.evaluate(e => getComputedStyle(e).transform), hover, 'press provides distinct feedback');
-      await page.mouse.move(10, 10); await page.mouse.up();
-      await page.mouse.move(500, 230); await page.waitForTimeout(80);
-      const firstPosition = await page.locator('.hero').evaluate(e => e.style.getPropertyValue('--ambient-x'));
-      await page.mouse.move(1200, 280); await page.waitForTimeout(80);
-      assert.notEqual(await page.locator('.hero').evaluate(e => e.style.getPropertyValue('--ambient-x')), firstPosition, 'background responds to pointer position');
+      const box = await page.locator('[data-arch] svg').boundingBox();
+      await page.mouse.move(box.x + 40, box.y + box.height * 0.5);
+      await page.waitForTimeout(100);
+      assert.ok(await page.locator('.g-in.is-near').count() > 0, 'inputs respond to the pointer');
+      await page.mouse.move(5, 5);
+      await page.waitForTimeout(100);
+      assert.equal(await page.locator('.g-in.is-near').count(), 0);
     }
-    assert.equal((await page.locator('h1').textContent()).replace(/\s+/g, ' ').trim(), 'AI for the trader');
-    assert.equal(await page.locator('#strategy-field').count(), 1);
-    assert.equal(await page.locator('.visual-emblem,.visual-node,.visual-connections,.visual-stage img[src*=prospect-mark]').count(), 0, 'hero contains no oversized brand badge or decorative pills');
-    const renderer = await page.locator('#strategy-field').getAttribute('data-renderer');
-    assert.ok(['webgl2', 'compositor'].includes(renderer));
-    assert.equal(await page.locator('.instrument-label,.hero-coordinate').count(), 0, 'small decorative labels remain removed');
-    const pixels = () => renderer === 'webgl2' ? page.locator('#strategy-field').evaluate(e => e.toDataURL()) : page.locator('.sculpture-fallback').evaluate(e => getComputedStyle(e).transform);
-    const moving = await pixels(); await page.waitForTimeout(350);
-    assert.ok((await pixels()) !== moving, 'visible research graphic animates');
-    await page.locator('[data-visual-step="1"]').focus(); await page.keyboard.press('Enter');
-    assert.equal(await page.locator('[data-visual-step="1"]').getAttribute('aria-pressed'), 'true');
-    assert.match(await page.locator('#workflow-note').textContent(), /clear rules/);
-    await page.waitForTimeout(650);
-    await page.locator('[data-visual-step="2"]').click();
-    assert.match(await page.locator('#workflow-note').textContent(), /share risk/);
-    const smallText = await page.locator('main').evaluate(main => [...main.querySelectorAll('*')].filter(node => [...node.childNodes].some(child => child.nodeType === 3 && child.textContent.trim())).filter(node => { const rect = node.getBoundingClientRect(); return rect.width > 0 && rect.height > 0 && parseFloat(getComputedStyle(node).fontSize) < 14; }).map(node => ({ tag: node.tagName, text: node.textContent.trim().slice(0, 50), size: getComputedStyle(node).fontSize })));
-    assert.deepEqual(smallText, [], 'homepage text remains at least 14px');
-    await page.locator('#product').scrollIntoViewIfNeeded();
-    await page.waitForTimeout(450); const paused = await pixels(); await page.waitForTimeout(250);
-    assert.ok((await pixels()) === paused, 'offscreen research graphic pauses');
+
+    // Research journey: one panel at a time, keyboard operable.
+    assert.equal(await page.locator('.step-panel:visible').count(), 1);
+    await page.locator('#step-tab-3').focus(); await page.keyboard.press('Enter');
+    assert.equal(await page.locator('#step-tab-3').getAttribute('aria-pressed'), 'true');
+    assert.ok(await page.locator('#step-panel-3').isVisible());
+    assert.equal(await page.locator('.step-panel:visible').count(), 1);
+
+    const smallText = await page.locator('main').evaluate(main => [...main.querySelectorAll('*')].filter(node => !node.closest('svg') && [...node.childNodes].some(child => child.nodeType === 3 && child.textContent.trim())).filter(node => { const rect = node.getBoundingClientRect(); return rect.width > 0 && rect.height > 0 && parseFloat(getComputedStyle(node).fontSize) < 14; }).map(node => node.textContent.trim().slice(0, 50)));
+    assert.deepEqual(smallText, [], 'no reading text below 14px');
     await page.locator('[data-preview=builder]').click();
+    await page.waitForFunction(() => document.querySelector('#product-screen').src.endsWith('strategy-builder.jpg'));
     await page.locator('[data-preview=home]').click();
-    await page.waitForFunction(() => document.querySelector('[data-preview=home]').getAttribute('aria-pressed') === 'true');
-    await page.waitForTimeout(750);
-    assert.match(await page.locator('#product-screen').getAttribute('src'), /workspace.jpg$/);
+    await page.waitForTimeout(800);
     assert.equal(await page.locator('.preview-outgoing').count(), 0, 'crossfade cleans up');
-    const summary = page.locator('.faq summary').first();
-    await summary.focus(); await page.keyboard.press('Enter');
-    await page.waitForFunction(() => document.querySelector('.faq details').open);
-    await page.waitForTimeout(450);
-    await page.keyboard.press('Enter');
-    await page.waitForFunction(() => !document.querySelector('.faq details').open);
-    await page.locator('.theme').click();
-    await page.waitForFunction(() => document.documentElement.dataset.theme === 'dark');
-    await page.locator('.theme').click();
-    await page.waitForFunction(() => document.documentElement.dataset.theme === 'light');
-    await page.waitForTimeout(650);
-    await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.waitForTimeout(200);
-    await page.locator('.hero').scrollIntoViewIfNeeded(); await page.waitForTimeout(200);
-    assert.equal(await page.locator('.hero').evaluate(e => e.style.getPropertyValue('--ambient-x')), '', 'reduced motion clears reactive background position');
-    const still = await pixels(); await page.waitForTimeout(300);
-    assert.ok((await pixels()) === still, 'reduced-motion graphic stays static');
-    await page.locator('[data-visual-step="0"]').click();
-    assert.match(await page.locator('#workflow-note').textContent(), /question about the markets/);
-    assert.equal(await page.evaluate(() => document.getAnimations().filter(a => a.playState === 'running').length), 0);
-    assert.equal(errors.length, 0);
-    results.push({ width, typography, headline: 'AI for the trader', minimumHomepageText: '14px', reactiveGraphic: `${renderer}: three sculptural scenes, no hero logo; keyboard/offscreen/reduced motion verified`, rapidPreviewSelection: 'passed', keyboardDisclosure: 'passed', themeTransition: 'two switches complete with matching final palette', buttonFeedback: width === 1440 ? 'prominent target; pointer highlight and press feedback verified' : 'prominent touch target verified', backgroundFeedback: width === 1440 ? 'pointer response verified; reduced motion clears it' : 'reduced motion clears reactive position', reducedMotion: 'static; no running animations', pageErrors: errors });
+    assert.equal(errors.length, 0, errors.join('\n'));
+    results.push({ width, typography, architecture });
     await page.close();
   }
-  const defaultPage = await browser.newPage({ colorScheme: 'dark' });
+  const reduced = await browser.newPage({ reducedMotion: 'reduce' });
+  await reduced.goto('http://127.0.0.1:3194/', { waitUntil: 'networkidle' });
+  assert.equal(await reduced.locator('[data-arch] svg').evaluate(svg => svg.getAnimations({ subtree: true }).length), 0, 'reduced motion shows the finished diagram');
+  await reduced.close();
+
+  const defaultContext = await browser.newContext({ colorScheme: 'dark' });
+  const defaultPage = await defaultContext.newPage();
   await defaultPage.goto('http://127.0.0.1:3194/');
   assert.equal(await defaultPage.locator('html').getAttribute('data-theme'), 'light', 'light is the default even with a dark OS setting');
   await defaultPage.locator('.theme').click();
-  await defaultPage.waitForFunction(() => document.documentElement.dataset.theme === 'dark');
   await defaultPage.reload();
   assert.equal(await defaultPage.locator('html').getAttribute('data-theme'), 'dark', 'explicit dark choice persists');
-  await defaultPage.close();
-  const noScript = await browser.newPage({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+  await defaultContext.close();
+
+  const noScriptContext = await browser.newContext({ javaScriptEnabled: false });
+  const noScript = await noScriptContext.newPage();
   await noScript.goto('http://127.0.0.1:3194/');
   assert.ok(await noScript.locator('h1').isVisible());
-  assert.equal(await noScript.locator('.workflow-controls').isVisible(), false, 'nonfunctional scene controls are hidden without scripting, including under the production CSP');
-  assert.ok(await noScript.locator('.hero .primary').isVisible());
-  assert.ok(await noScript.locator('.sculpture-fallback').evaluate(e => e.complete && e.naturalWidth > 0), 'static sculpture is visible without scripting');
-  await noScript.close();
-  const fallback = await browser.newPage();
-  await fallback.addInitScript(() => {
-    const original = HTMLCanvasElement.prototype.getContext;
-    HTMLCanvasElement.prototype.getContext = function(type, ...args) { return type === 'webgl2' ? null : original.call(this, type, ...args); };
-  });
-  await fallback.goto('http://127.0.0.1:3194/', { waitUntil: 'networkidle' });
-  assert.equal(await fallback.locator('.visual-ready').count(), 0);
-  assert.ok(await fallback.locator('.sculpture-fallback').evaluate(e => e.complete && e.naturalWidth > 0));
-  await fallback.locator('[data-visual-step="2"]').click();
-  await fallback.waitForFunction(() => { const img = document.querySelector('.sculpture-fallback'); return img.src.endsWith('intelligence-sculpture-2.webp') && img.complete && img.naturalWidth > 0; });
-  await fallback.close();
-  writeFileSync('evidence/typography-motion.json', JSON.stringify({ results, withoutJavaScript: 'headline, primary CTA and static sculpture visible', withoutWebGL: 'static scenes load and controls work' }, null, 2));
-  console.log('Real Geist loaded; bold trader headline, minimum 14px homepage text, light-first theme, reactive graphic, preview transitions, keyboard disclosures and reduced-motion/no-JS content verified.');
+  assert.ok(await noScript.locator('#waitlist-form .submit').isVisible());
+  assert.ok(await noScript.locator('.g-ai').isVisible(), 'diagram is complete without scripting');
+  assert.equal(await noScript.locator('.step-panel:visible').count(), 5, 'every step is readable without scripting');
+  await noScriptContext.close();
+  writeFileSync('evidence/typography-motion.json', JSON.stringify({ results }, null, 2));
+  console.log('Typography, finite diagram motion, pointer response, steps, previews, reduced motion, theme and no-script fallbacks pass.');
 } finally { await browser.close(); await new Promise(resolve => app.close(resolve)); }

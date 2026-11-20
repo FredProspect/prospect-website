@@ -71,11 +71,20 @@ for (const button of document.querySelectorAll('[data-preview]')) button.addEven
   document.querySelectorAll('[data-preview]').forEach(other => other.setAttribute('aria-pressed', String(other === button)));
   stage.removeAttribute('aria-busy');
 });
-const form = document.querySelector('#waitlist-form');
-form?.addEventListener('submit', async event => {
+document.documentElement.classList.add('js');
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+// Sticky header hairline once the page scrolls.
+const siteHeader = document.querySelector('.header');
+const onScroll = () => siteHeader?.classList.toggle('is-scrolled', scrollY > 8);
+addEventListener('scroll', onScroll, { passive: true });
+onScroll();
+
+// Waitlist forms (hero and closing). Both post to the same collector.
+for (const form of document.querySelectorAll('form[action="/api/waitlist"]')) form.addEventListener('submit', async event => {
   event.preventDefault();
   if (!form.reportValidity()) return;
-  const status = document.querySelector('#form-status');
+  const status = form.querySelector('.form-status');
   const submit = form.querySelector('button[type=submit]');
   submit.disabled = true;
   form.setAttribute('aria-busy', 'true');
@@ -87,6 +96,7 @@ form?.addEventListener('submit', async event => {
     if (!response.ok) throw Error(result.error || 'Registration unavailable. Please try again later.');
     status.textContent = result.message;
     form.reset();
+    form.classList.add('is-done');
   } catch (error) {
     status.classList.add('error');
     status.textContent = error.name === 'TimeoutError' ? 'The request timed out. Please retry; duplicate registrations are handled safely.' : error.message === 'Failed to fetch' ? 'Could not connect. Please try again later.' : error.message;
@@ -96,3 +106,36 @@ form?.addEventListener('submit', async event => {
     status.focus();
   }
 });
+
+// Research journey: one step at a time once scripting is available; all steps show without it.
+const steps = document.querySelector('[data-steps]');
+if (steps) {
+  const tabs = [...steps.querySelectorAll('[data-step]')];
+  const panels = [...steps.querySelectorAll('[data-step-panel]')];
+  const show = index => {
+    tabs.forEach((tab, i) => tab.setAttribute('aria-pressed', String(i === index)));
+    panels.forEach((panel, i) => { panel.hidden = i !== index; });
+  };
+  tabs.forEach((tab, i) => tab.addEventListener('click', () => show(i)));
+  show(0);
+}
+
+// Decision architecture: stagger the draw-in and let nearby inputs respond to the pointer.
+const arch = document.querySelector('[data-arch] svg');
+if (arch) {
+  const lines = [...arch.querySelectorAll('.g-in')];
+  lines.forEach(line => line.style.setProperty('--i', line.dataset.i));
+  let frame = 0;
+  let pointerY = null;
+  const paint = () => {
+    frame = 0;
+    for (const line of lines) line.classList.toggle('is-near', pointerY !== null && Math.abs(Number(line.dataset.y) - pointerY) < 30);
+  };
+  arch.addEventListener('pointermove', event => {
+    if (reducedMotion.matches || event.pointerType !== 'mouse') return;
+    const box = arch.getBoundingClientRect();
+    pointerY = (event.clientY - box.top) * (arch.viewBox.baseVal.height / box.height);
+    if (!frame) frame = requestAnimationFrame(paint);
+  });
+  arch.addEventListener('pointerleave', () => { pointerY = null; if (!frame) frame = requestAnimationFrame(paint); });
+}

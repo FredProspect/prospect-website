@@ -8,7 +8,7 @@ const app = createApp({ origin: 'http://127.0.0.1:3199' });
 await new Promise(resolve => app.listen(3199, '127.0.0.1', resolve));
 const results = [];
 try {
-  const browser = await chromium.launch({ executablePath: '/usr/bin/chromium', args: ['--no-sandbox'] });
+  const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', args: ['--no-sandbox'] });
   const page = await browser.newPage({ viewport: { width: 1200, height: 630 } });
   await page.goto('http://127.0.0.1:3199/brand/prospect-social-card.svg');
   await page.screenshot({ path: 'brand/prospect-social-card.jpg', type: 'jpeg', quality: 90 });
@@ -19,7 +19,7 @@ try {
     function sample(time) { if (previous) intervals.push(time - previous); previous = time; if (intervals.length < 120) requestAnimationFrame(sample); else { const sorted = [...intervals].sort((a,b) => a-b); resolve({ renderer: document.querySelector('#strategy-field')?.dataset.renderer, samples: intervals.length, medianFrame_ms: sorted[60], p95Frame_ms: sorted[114], framesOver35ms: intervals.filter(t => t > 35).length, note: 'Local Chromium rAF sample with real pointer movement across the CTA and background. Software-rendered browsers use composited sculpture artwork; not real-user hardware FPS, battery or INP.' }); } }
     requestAnimationFrame(sample);
   }));
-  const invitation = await page.locator('.hero .primary').boundingBox();
+  const invitation = await page.locator('.hero .submit').boundingBox();
   for (let step = 0; step < 60; step++) {
     if (step < 30) await page.mouse.move(invitation.x + 20 + step / 30 * (invitation.width - 40), invitation.y + invitation.height / 2);
     else await page.mouse.move(300 + (step - 30) * 30, 260 + Math.sin(step / 6) * 90);

@@ -3,108 +3,40 @@
     {
       "width": 1440,
       "typography": {
-        "family": "Geist, system-ui, sans-serif",
+        "family": "Geist, ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
         "weights": [
-          {
-            "weight": 400,
-            "loaded": true
-          },
-          {
-            "weight": 500,
-            "loaded": true
-          },
-          {
-            "weight": 600,
-            "loaded": true
-          }
+          true,
+          true,
+          true
         ],
-        "body": 18,
-        "headline": [
-          "600",
-          "600"
-        ],
-        "fonts": [
-          {
-            "family": "Geist",
-            "weight": "400",
-            "status": "loaded"
-          },
-          {
-            "family": "Geist",
-            "weight": "600",
-            "status": "loaded"
-          },
-          {
-            "family": "Geist",
-            "weight": "500",
-            "status": "loaded"
-          }
-        ]
+        "body": 17,
+        "headline": "600"
       },
-      "headline": "AI for the trader",
-      "minimumHomepageText": "14px",
-      "reactiveGraphic": "compositor: three sculptural scenes, no hero logo; keyboard/offscreen/reduced motion verified",
-      "rapidPreviewSelection": "passed",
-      "keyboardDisclosure": "passed",
-      "themeTransition": "two switches complete with matching final palette",
-      "buttonFeedback": "prominent target; pointer highlight and press feedback verified",
-      "backgroundFeedback": "pointer response verified; reduced motion clears it",
-      "reducedMotion": "static; no running animations",
-      "pageErrors": []
+      "architecture": {
+        "inputs": 34,
+        "running": 0,
+        "aiOffset": "0px",
+        "portfolio": "1"
+      }
     },
     {
       "width": 390,
       "typography": {
-        "family": "Geist, system-ui, sans-serif",
+        "family": "Geist, ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
         "weights": [
-          {
-            "weight": 400,
-            "loaded": true
-          },
-          {
-            "weight": 500,
-            "loaded": true
-          },
-          {
-            "weight": 600,
-            "loaded": true
-          }
+          true,
+          true,
+          true
         ],
         "body": 17,
-        "headline": [
-          "600",
-          "600"
-        ],
-        "fonts": [
-          {
-            "family": "Geist",
-            "weight": "400",
-            "status": "loaded"
-          },
-          {
-            "family": "Geist",
-            "weight": "600",
-            "status": "loaded"
-          },
-          {
-            "family": "Geist",
-            "weight": "500",
-            "status": "loaded"
-          }
-        ]
+        "headline": "600"
       },
-      "headline": "AI for the trader",
-      "minimumHomepageText": "14px",
-      "reactiveGraphic": "compositor: three sculptural scenes, no hero logo; keyboard/offscreen/reduced motion verified",
-      "rapidPreviewSelection": "passed",
-      "keyboardDisclosure": "passed",
-      "themeTransition": "two switches complete with matching final palette",
-      "buttonFeedback": "prominent touch target verified",
-      "backgroundFeedback": "reduced motion clears reactive position",
-      "reducedMotion": "static; no running animations",
-      "pageErrors": []
+      "architecture": {
+        "inputs": 34,
+        "running": 0,
+        "aiOffset": "0px",
+        "portfolio": "1"
+      }
     }
-  ],
-  "withoutJavaScript": "headline, primary CTA and static sculpture visible",
-  "withoutWebGL": "static scenes load and controls work"
+  ]
 }
