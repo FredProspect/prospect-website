@@ -9,9 +9,23 @@
   {
     "device": "desktop",
     "width": 1440,
+    "theme": "light",
+    "scope": "questionnaire",
+    "violations": []
+  },
+  {
+    "device": "desktop",
+    "width": 1440,
     "theme": "dark",
     "violations": [],
     "pageErrors": []
+  },
+  {
+    "device": "desktop",
+    "width": 1440,
+    "theme": "dark",
+    "scope": "questionnaire",
+    "violations": []
   },
   {
     "device": "mobile",

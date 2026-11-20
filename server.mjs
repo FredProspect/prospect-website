@@ -19,16 +19,49 @@ export function createApp(config = {}) {
     chmodSync(dbPath, 0o600);
     db.exec(`PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL;
       CREATE TABLE IF NOT EXISTS waitlist (email TEXT PRIMARY KEY, created_at TEXT NOT NULL, consent_version TEXT NOT NULL, consent_at TEXT NOT NULL, source TEXT);
-      CREATE TABLE IF NOT EXISTS rate_limits (key TEXT PRIMARY KEY, hits INTEGER NOT NULL, expires INTEGER NOT NULL);`);
+      CREATE TABLE IF NOT EXISTS rate_limits (key TEXT PRIMARY KEY, hits INTEGER NOT NULL, expires INTEGER NOT NULL);
+      CREATE TABLE IF NOT EXISTS waitlist_profile (email TEXT PRIMARY KEY REFERENCES waitlist(email), answers TEXT NOT NULL, profile_version TEXT NOT NULL, updated_at TEXT NOT NULL);`);
   }
+  const profileToken = email => createHmac('sha256', secret).update('profile:' + email).digest('hex').slice(0, 32);
   const reply = (res, status, body) => { res.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(body)); };
+  // Optional early-access questionnaire. Fixed answer sets only; one short free-text note.
+  const profileOptions = {
+    role: ['retail', 'prop-funded', 'prop-challenge', 'professional', 'exploring'],
+    markets: ['forex', 'indices-futures', 'stocks', 'crypto', 'commodities', 'options'],
+    experience: ['under-1', '1-3', '3-5', '5-plus'],
+    method: ['discretionary', 'spreadsheets', 'code', 'no-code-tools', 'not-yet'],
+    challenge: ['ideas-to-rules', 'testing', 'understanding-results', 'portfolio-risk', 'consistency'],
+    beta: ['yes', 'no']
+  };
+  function saveProfile(res, input) {
+    const email = typeof input.email === 'string' ? input.email.trim().toLowerCase() : '';
+    if (typeof input.token !== 'string' || input.token !== profileToken(email)) return reply(res, 403, { error: 'Please join the waitlist first.' });
+    const raw = input.answers && typeof input.answers === 'object' ? input.answers : {};
+    const answers = {};
+    for (const [key, allowed] of Object.entries(profileOptions)) {
+      const value = raw[key];
+      if (value === undefined || value === null || value === '') continue;
+      if (key === 'markets') {
+        if (!Array.isArray(value) || value.length > allowed.length || !value.every(v => allowed.includes(v))) return reply(res, 400, { error: 'Please check your answers.' });
+        answers.markets = [...new Set(value)];
+      } else if (allowed.includes(value)) answers[key] = value;
+      else return reply(res, 400, { error: 'Please check your answers.' });
+    }
+    if (typeof raw.note === 'string' && raw.note.trim()) answers.note = raw.note.replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, 500);
+    const exists = db.prepare('SELECT 1 FROM waitlist WHERE email = ?').get(email);
+    if (!exists) return reply(res, 403, { error: 'Please join the waitlist first.' });
+    db.prepare('INSERT INTO waitlist_profile VALUES (?, ?, ?, ?) ON CONFLICT(email) DO UPDATE SET answers = excluded.answers, profile_version = excluded.profile_version, updated_at = excluded.updated_at').run(email, JSON.stringify(answers), 'profile-2026-11-20', new Date().toISOString());
+    if (process.env.LOG_WAITLIST_EVENTS === '1') console.log(JSON.stringify({ event: 'waitlist.profile', result: 'saved' }));
+    return reply(res, 200, { message: 'Thanks — your answers help shape early access.' });
+  }
   const server = http.createServer(async (req, res) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
     res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://prospect-public-website-staging.up.railway.app; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
     const url = new URL(req.url, origin);
-    if (url.pathname === '/api/waitlist') {
+    if (url.pathname === '/api/waitlist' || url.pathname === '/api/waitlist/profile') {
+      const isProfile = url.pathname === '/api/waitlist/profile';
       if (allowedOrigins.has(req.headers.origin)) {
         res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
         res.setHeader('Vary', 'Origin');
@@ -44,7 +77,7 @@ export function createApp(config = {}) {
       if (!allowedOrigins.has(req.headers.origin)) return reply(res, 403, { error: 'Please submit the form from the Prospect website.' });
       if (!db) return reply(res, 503, { error: 'Registration is temporarily unavailable. Please try again later or contact the founder.' });
       const ip = process.env.TRUST_PROXY === '1' ? (req.headers['x-real-ip'] || req.socket.remoteAddress) : req.socket.remoteAddress;
-      const key = createHmac('sha256', secret).update(ip || 'unknown').digest('hex');
+      const key = createHmac('sha256', secret).update((isProfile ? 'profile:' : '') + (ip || 'unknown')).digest('hex');
       const now = Date.now();
       try {
       db.prepare('DELETE FROM rate_limits WHERE expires < ?').run(now);
@@ -55,9 +88,10 @@ export function createApp(config = {}) {
       if (!(req.headers['content-type'] || '').startsWith('application/json')) return reply(res, 415, { error: 'Please submit the website form.' });
       try {
         let body = '';
-        for await (const chunk of req) { body += chunk; if (Buffer.byteLength(body) > 2048) { reply(res, 413, { error: 'Request too large.' }); return; } }
+        for await (const chunk of req) { body += chunk; if (Buffer.byteLength(body) > (isProfile ? 4096 : 2048)) { reply(res, 413, { error: 'Request too large.' }); return; } }
         const input = JSON.parse(body);
         if (!input || typeof input !== 'object') return reply(res, 400, { error: 'Please check your form.' });
+        if (isProfile) return saveProfile(res, input);
         const email = typeof input.email === 'string' ? input.email.trim().toLowerCase() : '';
         if (email.length > 254 || !/^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+$/i.test(email)) return reply(res, 400, { error: 'Enter a valid email address.' });
         if (input.consent !== true) return reply(res, 400, { error: 'Please agree to receive launch and early-access emails to join.' });
@@ -66,7 +100,7 @@ export function createApp(config = {}) {
         const at = new Date().toISOString();
         const inserted = db.prepare('INSERT INTO waitlist VALUES (?, ?, ?, ?, ?) ON CONFLICT(email) DO NOTHING').run(email, at, 'waitlist-2026-11-16', at, source);
         if (process.env.LOG_WAITLIST_EVENTS === '1') console.log(JSON.stringify({ event: 'waitlist.persistence', result: inserted.changes ? 'created' : 'duplicate' }));
-        return reply(res, 200, { message: 'You’re on the list. We’ll email you with Prospect launch and early-access news. If you’ve joined before, your registration is already saved.' });
+        return reply(res, 200, { profileToken: profileToken(email), message: 'You’re on the list. We’ll email you with Prospect launch and early-access news. If you’ve joined before, your registration is already saved.' });
       } catch (error) {
         if (error instanceof SyntaxError) return reply(res, 400, { error: 'Please check your form and try again.' });
         // Do not log request bodies or email addresses.
@@ -82,8 +116,9 @@ export function createApp(config = {}) {
     try { if (!statSync(file).isFile()) throw Error(); } catch { file = resolve(root, '404.html'); status = 404; }
     const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.png': 'image/png', '.woff2': 'font/woff2', '.xml': 'application/xml', '.txt': 'text/plain' };
     try {
+      const content = readFileSync(file);
       res.writeHead(status, { 'Content-Type': types[extname(file)] || 'application/octet-stream', 'Cache-Control': file.endsWith('.html') ? 'no-cache' : 'public, max-age=3600' });
-      res.end(req.method === 'HEAD' ? undefined : readFileSync(file));
+      res.end(req.method === 'HEAD' ? undefined : content);
     } catch { reply(res, 503, { error: 'Site build unavailable.' }); }
   });
   server.requestTimeout = 10000;
