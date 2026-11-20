@@ -1,5 +1,17 @@
 # Prospect website — visual rebuild and release
 
+## Landing-page rebuild and early-access questionnaire — 20 November 2026
+
+The homepage is rebuilt as a single-purpose landing page aligned to the October 2026 brand book: light default, brand tokens (#FFFFFF/#F7F7F5/#111111/#19A974/slate/light grey), Geist, green only as a signal (CTA, active states, one highlighted mark per graphic), and dark Social Black bands used twice for emphasis. The email form is in the hero and repeated at the end. Header, footer and article pages inherit the brand tokens.
+
+Graphics: an animated "Strategy studio" demo (Describe → Rules → Test → Understand) styled like the platform's panels, plays once when visible and is user-steppable; a synthetic monitoring card with Stable/Watch/Review states; three step illustrations; the genuine prototype screenshots. Every chart is labelled synthetic or illustrative; there are no returns, balances or user counts. The WebGL sculpture, motion.js and intelligence-visual.js are no longer loaded (files left in place).
+
+After a successful signup a full-screen, Typeform-style questionnaire opens (native dialog, one question per screen, keyboard letters, auto-advance, back/skip): role, markets, experience, method, main challenge, one free-text note (500 chars), beta interest. All optional. New `POST /api/waitlist/profile` accepts only fixed answer values, needs the HMAC token returned by signup, requires an existing waitlist row, has its own rate-limit bucket and a 4 KiB limit, and stores answers in a new `waitlist_profile` table (created automatically, existing rows untouched). `export:waitlist` now includes the answers. Privacy notice updated (20 November 2026).
+
+Release dependency: the Railway collector is pinned to an older commit, so the questionnaire saves only after the collector service is redeployed from this branch. Until then signups still work and the questionnaire shows "your waitlist place is saved" if its save fails. Deploy the collector first, then publish the static site.
+
+Also fixed: the static handler read files after writing headers, which could crash the process if a file vanished between stat and read.
+
 ## Waitlist emphasis and responsive feedback — 17 November 2026
 
 The waitlist invitation now leads the visual hierarchy: a larger 68px desktop hero button, a full-width mobile button, a richer emerald finish, stronger weight, a framed arrow and a coordinated treatment in the sticky navigation and final signup form. The closing invitation reads “Be part of what comes next.” Native links still lead directly to the existing signup section. Shorter laptop layouts keep the enlarged primary CTA on the first screen, checked at 1440×768, 1366×768, 1280×720 and 1200×630.

@@ -91,7 +91,7 @@ test('rejects malformed, oversized and non-JSON submissions without leaking form
     assert.equal((await request('email=private%40example.com', 'application/x-www-form-urlencoded')).status, 415);
     assert.equal((await fetch(app.url + '/api/waitlist')).status, 405);
     const html = await (await fetch(app.url)).text();
-    assert.match(html, /<form id="waitlist-form" method="post" action="\/api\/waitlist">/);
+    assert.match(html, /<form [^>]*id="waitlist-form" method="post" action="\/api\/waitlist"/);
   } finally { await app.close(); rmSync(folder, { recursive: true }); }
 });
 test('cross-origin collector accepts only configured public sites, including preflight', async () => {
@@ -106,4 +106,43 @@ test('cross-origin collector accepts only configured public sites, including pre
     assert.equal(denied.status, 403);
     assert.equal(denied.headers.get('access-control-allow-origin'), null);
   } finally { await app.close(); }
+});
+test('optional questionnaire requires the signup token, accepts only known answers and is exported', async () => {
+  const folder = mkdtempSync(join(tmpdir(), 'prospect-profile-'));
+  const dbPath = join(folder, 'leads.sqlite');
+  const app = await start({ dbPath, secret });
+  const profile = body => fetch(app.url + '/api/waitlist/profile', { method: 'POST', headers: { Origin: 'https://prospectpartnership.co.uk', 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  try {
+    const joined = await (await app.post({ email: 'Trader@example.com', consent: true })).json();
+    assert.match(joined.profileToken, /^[a-f0-9]{32}$/);
+    const answers = { role: 'prop-funded', markets: ['forex', 'indices-futures', 'forex'], experience: '3-5', method: 'code', challenge: 'testing', beta: 'yes', note: '  Faster regime checks\u0007  ' };
+    assert.equal((await profile({ email: 'trader@example.com', token: 'wrong', answers })).status, 403);
+    assert.equal((await profile({ email: 'other@example.com', token: joined.profileToken, answers })).status, 403);
+    assert.equal((await profile({ email: 'trader@example.com', token: joined.profileToken, answers: { role: 'hacker' } })).status, 400);
+    assert.equal((await profile({ email: 'trader@example.com', token: joined.profileToken, answers: { markets: ['forex', 'drop table'] } })).status, 400);
+    assert.equal((await profile({ email: 'trader@example.com', token: joined.profileToken, answers: { note: 'x'.repeat(5000) } })).status, 413);
+    assert.equal((await profile({ email: 'trader@example.com', token: joined.profileToken, answers })).status, 200);
+    const db = new DatabaseSync(dbPath, { readOnly: true });
+    const row = db.prepare('SELECT * FROM waitlist_profile').get();
+    assert.deepEqual(JSON.parse(row.answers), { role: 'prop-funded', markets: ['forex', 'indices-futures'], experience: '3-5', method: 'code', challenge: 'testing', beta: 'yes', note: 'Faster regime checks' });
+    assert.equal(row.profile_version, 'profile-2026-11-20');
+    db.close();
+    const { execFileSync } = await import('node:child_process');
+    const csv = execFileSync(process.execPath, ['scripts/export-waitlist.mjs'], { env: { ...process.env, WAITLIST_DB: dbPath } }).toString();
+    assert.match(csv, /"trader@example.com".*"prop-funded","forex indices-futures","3-5","code","testing","yes","Faster regime checks"/);
+  } finally { await app.close(); rmSync(folder, { recursive: true }); }
+});
+test('existing waitlist databases gain the questionnaire table without losing records', async () => {
+  const folder = mkdtempSync(join(tmpdir(), 'prospect-migrate-'));
+  const dbPath = join(folder, 'leads.sqlite');
+  const old = new DatabaseSync(dbPath);
+  old.exec("CREATE TABLE waitlist (email TEXT PRIMARY KEY, created_at TEXT NOT NULL, consent_version TEXT NOT NULL, consent_at TEXT NOT NULL, source TEXT); INSERT INTO waitlist VALUES ('early@example.com','2026-11-16T00:00:00Z','waitlist-2026-11-16','2026-11-16T00:00:00Z','homepage');");
+  old.close();
+  const app = await start({ dbPath, secret });
+  try {
+    const db = new DatabaseSync(dbPath, { readOnly: true });
+    assert.equal(db.prepare('SELECT COUNT(*) AS n FROM waitlist').get().n, 1);
+    assert.ok(db.prepare("SELECT 1 FROM sqlite_master WHERE name = 'waitlist_profile'").get());
+    db.close();
+  } finally { await app.close(); rmSync(folder, { recursive: true }); }
 });
