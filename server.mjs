@@ -1,9 +1,10 @@
 import http from 'node:http';
 import { DatabaseSync } from 'node:sqlite';
-import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
+import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import { mkdirSync, chmodSync, readFileSync, statSync } from 'node:fs';
 import { dirname, resolve, extname } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { createResendMailer, confirmationEmail } from './waitlist-mail.mjs';
 
 const CONSENT_VERSION = 'waitlist-2026-11-16';
 // Unambiguous alphabet (no 0/O, 1/I/L) so codes survive being read aloud or retyped.
@@ -13,6 +14,9 @@ const EMAIL_PATTERN = /^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9](?:[a-z0-9-]*[a-z0
 
 const newReferralCode = () => [...randomBytes(8)].map(byte => CODE_ALPHABET[byte % CODE_ALPHABET.length]).join('');
 const normaliseCode = value => (typeof value === 'string' ? value.trim().toUpperCase() : '');
+const CONFIRM_TTL_MS = 7 * 24 * 3600 * 1000;
+const RESEND_GAP_MS = 10 * 60 * 1000;
+const hashToken = token => createHash('sha256').update(token).digest('hex');
 const csvCell = value => '"' + String(value ?? '').replace(/^[=+@-]/, "'$&").replaceAll('"', '""') + '"';
 
 /** Opens the waitlist database and applies additive, idempotent migrations. Existing rows are never removed. */
@@ -26,18 +30,23 @@ export function openWaitlist(dbPath) {
   const columns = new Set(db.prepare('PRAGMA table_info(waitlist)').all().map(column => column.name));
   if (!columns.has('referral_code')) db.exec('ALTER TABLE waitlist ADD COLUMN referral_code TEXT');
   if (!columns.has('referred_by')) db.exec('ALTER TABLE waitlist ADD COLUMN referred_by TEXT');
+  for (const column of ['confirmed_at', 'confirm_token_hash', 'confirm_sent_at']) if (!columns.has(column)) db.exec(`ALTER TABLE waitlist ADD COLUMN ${column} TEXT`);
   const missing = db.prepare('SELECT email FROM waitlist WHERE referral_code IS NULL').all();
   const assign = db.prepare('UPDATE waitlist SET referral_code = ? WHERE email = ?');
   for (const { email } of missing) assign.run(newReferralCode(), email);
   db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS waitlist_referral_code ON waitlist(referral_code);
-    CREATE INDEX IF NOT EXISTS waitlist_referred_by ON waitlist(referred_by);`);
+    CREATE INDEX IF NOT EXISTS waitlist_referred_by ON waitlist(referred_by);
+    CREATE INDEX IF NOT EXISTS waitlist_confirm_token ON waitlist(confirm_token_hash);`);
   return db;
 }
 
+// With email confirmation on, only confirmed friends count as referrals.
+const referralCount = confirmedOnly => `(SELECT COUNT(*) FROM waitlist r WHERE r.referred_by = w.referral_code${confirmedOnly ? ' AND r.confirmed_at IS NOT NULL' : ''})`;
+
 // Rank: more successful referrals first, then earlier signup. Each referral moves a member ahead of everyone with fewer.
-const RANKED = `WITH scored AS (
-    SELECT w.email, w.created_at, w.referral_code, w.referred_by, w.source, w.consent_version, w.consent_at,
-      (SELECT COUNT(*) FROM waitlist r WHERE r.referred_by = w.referral_code) AS referrals
+const ranked = confirmedOnly => `WITH scored AS (
+    SELECT w.email, w.created_at, w.referral_code, w.referred_by, w.source, w.consent_version, w.consent_at, w.confirmed_at,
+      ${referralCount(confirmedOnly)} AS referrals
     FROM waitlist w)
   SELECT s.*, (SELECT COUNT(*) FROM scored o WHERE o.referrals > s.referrals OR (o.referrals = s.referrals AND o.created_at < s.created_at)) + 1 AS position
   FROM scored s`;
@@ -45,15 +54,15 @@ const RANKED = `WITH scored AS (
 // Members see a tier, never their exact place or the list size: 0-2 referrals low, 3-4 medium, 5+ high.
 export const tierFor = referrals => (referrals >= 5 ? 'high' : referrals >= 3 ? 'medium' : 'low');
 
-export function standingFor(db, code) {
-  const row = db.prepare('SELECT referral_code, (SELECT COUNT(*) FROM waitlist r WHERE r.referred_by = w.referral_code) AS referrals FROM waitlist w WHERE referral_code = ?').get(code);
-  return row ? { code: row.referral_code, referrals: row.referrals, tier: tierFor(row.referrals) } : null;
+export function standingFor(db, code, confirmedOnly = false) {
+  const row = db.prepare(`SELECT referral_code, confirmed_at, ${referralCount(confirmedOnly)} AS referrals FROM waitlist w WHERE referral_code = ?`).get(code);
+  return row ? { code: row.referral_code, referrals: row.referrals, tier: tierFor(row.referrals), confirmed: !confirmedOnly || Boolean(row.confirmed_at) } : null;
 }
 
-export function exportCsv(db) {
-  const header = 'position,email,referrals,referral_code,referred_by,created_at,consent_version,consent_at,source';
-  const rows = db.prepare(`${RANKED} ORDER BY position`).all()
-    .map(row => [row.position, row.email, row.referrals, row.referral_code, row.referred_by, row.created_at, row.consent_version, row.consent_at, row.source].map(csvCell).join(','));
+export function exportCsv(db, confirmedOnly = false) {
+  const header = 'position,email,confirmed_at,referrals,referral_code,referred_by,created_at,consent_version,consent_at,source';
+  const rows = db.prepare(`${ranked(confirmedOnly)} ORDER BY position`).all()
+    .map(row => [row.position, row.email, row.confirmed_at, row.referrals, row.referral_code, row.referred_by, row.created_at, row.consent_version, row.consent_at, row.source].map(csvCell).join(','));
   return [header, ...rows].join('\n') + '\n';
 }
 
@@ -71,6 +80,29 @@ export function createApp(config = {}) {
   const additionalOrigin = config.additionalOrigin || process.env.ADDITIONAL_PUBLIC_ORIGIN;
   const allowedOrigins = new Set([origin, ...(additionalOrigin ? [additionalOrigin] : [])]);
   const db = dbPath && secret?.length >= 32 ? openWaitlist(dbPath) : null;
+  // Email confirmation switches on only when Resend is configured; until then signups behave as before.
+  const mailer = config.mailer !== undefined ? config.mailer : createResendMailer({ apiKey: process.env.RESEND_API_KEY, from: process.env.MAIL_FROM });
+  const confirmedOnly = Boolean(mailer);
+  // Confirmation links point at this collector service, which then returns people to the public site.
+  const collectorOrigin = config.collectorOrigin || process.env.COLLECTOR_ORIGIN || additionalOrigin || origin;
+
+  /** Issues a fresh single-use link, at most once per 10 minutes per address. Delivery failures never fail a signup. */
+  const sendConfirmation = async email => {
+    if (!mailer) return;
+    const row = db.prepare('SELECT confirmed_at, confirm_sent_at FROM waitlist WHERE email = ?').get(email);
+    if (!row || row.confirmed_at) return;
+    if (row.confirm_sent_at && Date.now() - Date.parse(row.confirm_sent_at) < RESEND_GAP_MS) return;
+    const token = randomBytes(32).toString('base64url');
+    db.prepare('UPDATE waitlist SET confirm_token_hash = ?, confirm_sent_at = ? WHERE email = ?').run(hashToken(token), new Date().toISOString(), email);
+    try {
+      await mailer({ to: email, ...confirmationEmail({ link: `${collectorOrigin}/api/waitlist/confirm?token=${token}`, siteOrigin: origin }) });
+      if (process.env.LOG_WAITLIST_EVENTS === '1') console.log(JSON.stringify({ event: 'waitlist.confirmation', result: 'sent' }));
+    } catch {
+      // Allow an immediate retry, and never log the address.
+      db.prepare('UPDATE waitlist SET confirm_sent_at = NULL WHERE email = ?').run(email);
+      console.log(JSON.stringify({ event: 'waitlist.confirmation', result: 'failed' }));
+    }
+  };
   const reply = (res, status, body) => { res.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(body)); };
 
   /** Durable per-network rate limit. Returns false (after replying) when the caller must stop. */
@@ -103,10 +135,11 @@ export function createApp(config = {}) {
       .run(email, at, CONSENT_VERSION, at, source, newReferralCode(), referrer ?? null);
     if (process.env.LOG_WAITLIST_EVENTS === '1') console.log(JSON.stringify({ event: 'waitlist.persistence', result: inserted.changes ? 'created' : 'duplicate', referred: Boolean(inserted.changes && referrer) }));
     const { referral_code: code } = db.prepare('SELECT referral_code FROM waitlist WHERE email = ?').get(email);
+    await sendConfirmation(email);
     return reply(res, 200, {
       // Same reply for new and existing emails, so the endpoint never reveals who has already joined.
       message: 'You’re on the list.',
-      referral: standingFor(db, code)
+      referral: standingFor(db, code, confirmedOnly)
     });
   };
 
@@ -125,15 +158,40 @@ export function createApp(config = {}) {
       if (!db || !adminToken || adminToken.length < 32 || req.method !== 'GET') return reply(res, 404, { error: 'Not found.' });
       if (!tokensMatch((req.headers.authorization || '').replace(/^Bearer /, ''), adminToken)) return reply(res, 401, { error: 'Unauthorised.' });
       res.writeHead(200, { 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': 'attachment; filename="prospect-waitlist.csv"', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' });
-      return res.end(exportCsv(db));
+      return res.end(exportCsv(db, confirmedOnly));
     }
     if (route === '/api/waitlist/status') {
       if (req.method !== 'GET') return reply(res, 405, { error: 'Use GET.' });
       if (!db) return reply(res, 503, { error: 'Status is temporarily unavailable.' });
       if (!withinRateLimit(req, res, 'status', 60)) return;
       const code = normaliseCode(url.searchParams.get('code'));
-      const standing = CODE_PATTERN.test(code) ? standingFor(db, code) : null;
+      const standing = CODE_PATTERN.test(code) ? standingFor(db, code, confirmedOnly) : null;
       return standing ? reply(res, 200, { referral: standing }) : reply(res, 404, { error: 'Referral code not found.' });
+    }
+    if (route === '/api/waitlist/confirm') {
+      // Reached from the email link: confirm, then send the person back to the site with the outcome.
+      const back = outcome => { res.writeHead(303, { Location: `${origin}/?confirmed=${outcome}#waitlist`, 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' }); res.end(); };
+      if (!db || req.method !== 'GET') return back('invalid');
+      const token = url.searchParams.get('token') || '';
+      if (!/^[A-Za-z0-9_-]{43}$/.test(token)) return back('invalid');
+      const row = db.prepare('SELECT email, confirm_sent_at FROM waitlist WHERE confirm_token_hash = ?').get(hashToken(token));
+      if (!row || Date.now() - Date.parse(row.confirm_sent_at) > CONFIRM_TTL_MS) return back('invalid');
+      db.prepare('UPDATE waitlist SET confirmed_at = ?, confirm_token_hash = NULL WHERE email = ?').run(new Date().toISOString(), row.email);
+      return back('1');
+    }
+    if (route === '/api/waitlist/resend') {
+      if (req.method !== 'POST') return reply(res, 405, { error: 'Use POST.' });
+      if (!allowedOrigins.has(req.headers.origin)) return reply(res, 403, { error: 'Please use the Prospect website.' });
+      if (!db) return reply(res, 503, { error: 'Temporarily unavailable.' });
+      if (!withinRateLimit(req, res, 'resend', 6)) return;
+      try {
+        let body = '';
+        for await (const chunk of req) { body += chunk; if (body.length > 512) return reply(res, 413, { error: 'Request too large.' }); }
+        const code = normaliseCode(JSON.parse(body)?.code);
+        const row = CODE_PATTERN.test(code) ? db.prepare('SELECT email FROM waitlist WHERE referral_code = ?').get(code) : null;
+        if (row) await sendConfirmation(row.email);
+      } catch { /* Same reply either way. */ }
+      return reply(res, 200, { message: 'If your email still needs confirming, a new link is on its way. Check your spam folder too.' });
     }
     if (route !== '/api/waitlist') return reply(res, 404, { error: 'Not found.' });
     if (req.method !== 'POST') return reply(res, 405, { error: 'Use POST to register.' });

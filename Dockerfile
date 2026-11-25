@@ -12,7 +12,7 @@ FROM node:24-bookworm-slim
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000 WAITLIST_DB=/var/lib/prospect/waitlist.sqlite
 WORKDIR /app
 COPY --from=build /app/dist ./dist
-COPY server.mjs ./
+COPY server.mjs waitlist-mail.mjs ./
 COPY package.json ./
 COPY scripts/export-waitlist.mjs ./scripts/export-waitlist.mjs
 COPY scripts/start.mjs ./scripts/start.mjs

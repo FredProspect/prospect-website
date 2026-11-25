@@ -2,7 +2,10 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { EMAIL } from './content';
 
 type Status = { tone: 'idle' | 'busy' | 'done' | 'error'; message: string };
-export type Standing = { code: string; referrals: number; tier: 'low' | 'medium' | 'high' };
+export type Standing = { code: string; referrals: number; tier: 'low' | 'medium' | 'high'; confirmed?: boolean };
+
+/** Outcome of arriving from the confirmation email (?confirmed=1 or ?confirmed=invalid), shown once. */
+let arrival: 'confirmed' | 'invalid' | null = null;
 
 const SITE = 'https://prospectpartnership.co.uk/';
 const CODE_KEY = 'prospect-referral-code';
@@ -37,6 +40,25 @@ const TIERS = {
 const listeners = new Set<(standing: Standing | null) => void>();
 const broadcast = (standing: Standing | null) => listeners.forEach(listener => listener(standing));
 
+const ConfirmPrompt = ({ code }: { code: string }) => {
+  const [note, setNote] = useState('');
+  const resend = async () => {
+    setNote('Sending…');
+    try {
+      const response = await fetch(`${endpoint()}/resend`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }), signal: AbortSignal.timeout(10000) });
+      const result = await response.json();
+      setNote(result.message || result.error || 'Please try again shortly.');
+    } catch { setNote('Could not connect. Please try again shortly.'); }
+  };
+  return (
+    <div className="confirm-prompt">
+      <p><strong>Check your inbox to confirm your email.</strong> Your place, and any friends you refer, only count once confirmed.</p>
+      <button type="button" className="referral-reset" onClick={resend}>Resend confirmation email</button>
+      <span className="confirm-note" role="status" aria-live="polite">{note}</span>
+    </div>
+  );
+};
+
 const ReferralCard = ({ standing, onReset, suffix }: { standing: Standing; onReset: () => void; suffix: string }) => {
   const link = `${SITE}?ref=${standing.code}`;
   const tier = TIERS[standing.tier] ?? TIERS.low;
@@ -49,6 +71,9 @@ const ReferralCard = ({ standing, onReset, suffix }: { standing: Standing; onRes
   const canShare = typeof navigator !== 'undefined' && 'share' in navigator;
   return (
     <div className="referral-card" role="region" aria-label="Your waitlist place">
+      {arrival === 'confirmed' && standing.confirmed !== false && <p className="referral-notice is-good" role="status">Email confirmed. Your place is secured.</p>}
+      {arrival === 'invalid' && <p className="referral-notice" role="status">That confirmation link has expired or was already used.{standing.confirmed === false ? ' Send yourself a new one below.' : ''}</p>}
+      {standing.confirmed === false && <ConfirmPrompt code={standing.code} />}
       <p className="referral-eyebrow">You’re on the list</p>
       <p className="referral-place">{tier.label}</p>
       <div className="tier-meter" aria-hidden="true">{[1, 2, 3].map(step => <span key={step} className={step <= tier.step ? 'is-on' : ''} />)}</div>
@@ -80,6 +105,13 @@ export const Waitlist = ({ suffix = '' }: { suffix?: string }) => {
   // Returning members see their live place instead of the form. Only the first form fetches.
   useEffect(() => {
     if (suffix) return;
+    const outcome = new URLSearchParams(location.search).get('confirmed');
+    if (outcome) {
+      arrival = outcome === '1' ? 'confirmed' : 'invalid';
+      const clean = new URL(location.href);
+      clean.searchParams.delete('confirmed');
+      history.replaceState(null, '', clean);
+    }
     const code = store.get(CODE_KEY);
     if (!code || !CODE_PATTERN.test(code)) return;
     fetch(`${endpoint()}/status?code=${code}`, { signal: AbortSignal.timeout(8000) })

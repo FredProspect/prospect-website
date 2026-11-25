@@ -300,3 +300,11 @@ details[open]::details-content{block-size:auto}
 .referral-reset{all:unset;cursor:pointer;margin-top:1rem;font-size:.875rem;color:var(--ink-3);text-decoration:underline;text-underline-offset:3px}
 .referral-reset:hover{color:var(--ink)}
 .referral-reset:focus-visible{outline:2px solid var(--signal);outline-offset:3px}
+
+/* Email confirmation states inside the referral card */
+.referral-notice{margin:-4px 0 16px;padding:10px 14px;border-radius:12px;font-size:.9rem;color:var(--ink);background:rgba(255,138,122,.12);border:1px solid rgba(255,138,122,.3)}
+.referral-notice.is-good{background:rgba(43,196,138,.12);border-color:rgba(43,196,138,.4)}
+.confirm-prompt{margin:0 0 18px;padding:14px 16px;border-radius:14px;background:rgba(43,196,138,.08);border:1px dashed rgba(43,196,138,.45);font-size:.95rem;color:var(--ink-2)}
+.confirm-prompt strong{color:var(--ink);font-weight:600}
+.confirm-prompt .referral-reset{margin-top:.5rem;display:inline-block}
+.confirm-note{display:block;margin-top:.3rem;font-size:.875rem;color:var(--ink-3)}

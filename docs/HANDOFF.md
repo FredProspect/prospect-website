@@ -144,3 +144,12 @@ Remaining verification limits: Firefox/WebKit executables were unavailable; real
 - **Export:** `GET /api/waitlist/export` with `Authorization: Bearer $WAITLIST_ADMIN_TOKEN` returns a ranked CSV. It is disabled (404) unless `WAITLIST_ADMIN_TOKEN` (32+ characters) is set in Railway variables. The shell export `node scripts/export-waitlist.mjs` produces the same CSV.
 - **Deploy order:** the collector is pinned. Deploy this commit to the Railway collector service, keeping the volume attached, then confirm the referral card appears after a test signup. Until then the frontend falls back to the plain "You're on the list" message.
 - **Abuse note:** there is no email verification, so referrals can be inflated with throwaway addresses. Before inviting beta testers, review the referral counts in the export, and consider double opt-in once an email provider is configured.
+
+## Email confirmation (Resend)
+
+- **Off by default.** It turns on only when `RESEND_API_KEY` and `MAIL_FROM` are both set on the Railway collector. Until then, behaviour is unchanged and every signup counts.
+- **Flow:** signup is saved unconfirmed → a single-use link (32 random bytes, stored only as a SHA-256 hash, valid 7 days) is emailed → `GET /api/waitlist/confirm?token=` sets `confirmed_at` and redirects with 303 to `PUBLIC_ORIGIN/?confirmed=1#waitlist`. Invalid or expired links redirect with `?confirmed=invalid`.
+- **Counting:** with confirmation on, only confirmed friends count as referrals and towards tiers. The export includes `confirmed_at`, so filter to confirmed members before inviting beta testers.
+- **Resends:** a repeat signup, or `POST /api/waitlist/resend {code}` (6 per 15 minutes per network), sends a fresh link at most once every 10 minutes per address. Provider failures never fail a signup and are logged without addresses.
+- **Setup:** create a Resend account → add and verify `prospectpartnership.co.uk` (SPF/DKIM DNS records at your domain host) → create an API key with sending access → set `RESEND_API_KEY`, `MAIL_FROM=Prospect <waitlist@prospectpartnership.co.uk>` and `COLLECTOR_ORIGIN=https://prospect-public-website-staging.up.railway.app` on the collector → redeploy with the volume attached → sign up with a test address and click the link.
+- **Existing members** from before confirmation was switched on are unconfirmed. Their own place is kept, but they won't count towards anyone's referrals until they confirm. A repeat signup or a resend sends them a link.
