@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import Threads from './bits/Threads/Threads';
 import DarkVeil from './bits/DarkVeil/DarkVeil';
-import SpotlightCard from './bits/SpotlightCard/SpotlightCard';
 import Magnet from './bits/Magnet/Magnet';
 import ScrollReveal from './bits/ScrollReveal/ScrollReveal';
 import { Waitlist } from './Waitlist';
-import { EMAIL, LINKEDIN, faqs, previews, principles, steps, type PreviewKey } from './content';
+import { EMAIL, LINKEDIN, faqs, perks, previews, steps, type PreviewKey } from './content';
+import { illustrations } from './Illustrations';
 import { EASE, gsap, revealLines, ScrollTrigger, useGsap, useSmoothScroll } from './motion';
 
 const Arrow = () => <span className="btn-arrow" aria-hidden="true">→</span>;
@@ -34,12 +34,16 @@ const Header = () => {
           <a href="#product">Product</a><a href="#how-it-works">How it works</a><a href="#about">About</a><a href={`mailto:${EMAIL}`}>Contact</a>
         </nav>
         <Magnet padding={40} magnetStrength={4} maxOffset={8} wrapperClassName="nav-cta-wrap">
-          <a className="btn btn-solid btn-sm" href="#waitlist">Join waitlist <Arrow /></a>
+          <a className="btn btn-solid btn-sm" href="#waitlist">Get early access <Arrow /></a>
         </Magnet>
       </div>
     </header>
   );
 };
+
+const Check = () => <svg className="perk-tick" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" /></svg>;
+
+const Perks = () => <ul className="perks">{perks.map(p => <li key={p}><Check />{p}</li>)}</ul>;
 
 const Hero = () => {
   const ref = useRef<HTMLElement>(null);
@@ -58,10 +62,10 @@ const Hero = () => {
         <Threads color="#8a8f93" accentColor="#2bc48a" lineCount={46} amplitude={1.1} distance={0.25} speed={0.35} angle={-12} parting={0.35} taper={0.9} brightness={1.1} fade={0.45} opacity={0.85} enableMouseInteraction />
       </div>
       <div className="hero-inner wrap">
-        <p className="pill reveal"><span className="dot" aria-hidden="true" />Pre-launch · Waitlist open</p>
+        <p className="pill reveal"><span className="dot" aria-hidden="true" />Early access · Waitlist now open</p>
         <h1 id="hero-title">AI for{' '}<br />the trader.</h1>
-        <p className="lede reveal">Develop strategies, question the evidence and understand your risk across every strategy you run. AI-assisted trading research, being built for independent traders.</p>
-        <div className="reveal hero-form"><Waitlist /></div>
+        <p className="lede reveal">Describe a strategy idea. Prospect is being built to turn it into rules, test it honestly and watch your risk. <strong>Join the waitlist to be first in.</strong></p>
+        <div className="reveal hero-form"><Waitlist /><Perks /></div>
       </div>
       <div className="hero-foot wrap reveal">
         <span>Built for independent minds</span>
@@ -123,22 +127,43 @@ const Product = () => {
   );
 };
 
+/** Paused timeline that draws one step illustration: lines trace, bars grow, marks pop in. */
+const drawVisual = (card: HTMLElement) => {
+  const tl = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } });
+  const q = (selector: string) => card.querySelectorAll(selector);
+  if (q('.ill-band, .draw-fill').length) tl.from(q('.ill-band, .draw-fill'), { opacity: 0, duration: 1.2 }, 0);
+  if (q('.draw').length) tl.fromTo(q('.draw'), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.6, ease: 'power2.inOut', stagger: 0.2 }, 0.1);
+  if (q('.grow').length) tl.from(q('.grow'), { scaleX: 0, transformOrigin: '0% 50%', duration: 1.3, stagger: 0.15 }, 0.15);
+  if (q('.pop').length) tl.from(q('.pop'), { opacity: 0, scale: 0.6, transformOrigin: '50% 50%', duration: 0.8, stagger: 0.03, ease: 'back.out(1.7)' }, 0.5);
+  if (q('.draw-box').length) tl.from(q('.draw-box'), { opacity: 0, scale: 1.08, transformOrigin: '50% 50%', duration: 0.9 }, 1.1);
+  return tl;
+};
+
 const HowItWorks = () => {
   const ref = useRef<HTMLElement>(null);
   const [current, setCurrent] = useState(0);
   useGsap(ref, root => {
     revealLines(root.querySelector('h2')!, { scrollTrigger: { trigger: root, start: 'top 70%' } });
-    gsap.matchMedia().add('(min-width: 900px)', () => {
-      const cards = gsap.utils.toArray<HTMLElement>('.step-card', root);
+    const cards = gsap.utils.toArray<HTMLElement>('.step-card', root);
+    const visuals = cards.map(drawVisual);
+    const mm = gsap.matchMedia();
+    mm.add('(min-width: 900px)', () => {
       gsap.set(cards.slice(1), { yPercent: 115 });
+      ScrollTrigger.create({ trigger: '.steps-pin', start: 'top 70%', once: true, onEnter: () => visuals[0].play() });
       const tl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: {
-        trigger: '.steps-pin', start: 'top top+=96', end: () => `+=${innerHeight * (cards.length - 1) * 0.85}`, pin: true, scrub: 0.6,
-        snap: { snapTo: 1 / (cards.length - 1), duration: { min: 0.2, max: 0.6 }, ease: 'power2.inOut' },
-        onUpdate: self => setCurrent(Math.round(self.progress * (cards.length - 1)))
+        trigger: '.steps-pin', start: 'top top+=96', end: () => `+=${innerHeight * (cards.length - 1) * 0.9}`, pin: true, scrub: 1.2,
+        onUpdate: self => {
+          const index = Math.round(self.progress * (cards.length - 1));
+          setCurrent(index);
+          visuals[index].play();
+        }
       } });
       cards.slice(1).forEach((card, i) => {
-        tl.to(card, { yPercent: 0 }, i).to(cards[i], { scale: 0.92, opacity: 0.35, filter: 'blur(2px)' }, i);
+        tl.to(card, { yPercent: 0, ease: 'power1.inOut' }, i).to(cards[i], { scale: 0.93, opacity: 0.3, ease: 'power1.inOut' }, i);
       });
+    });
+    mm.add('(max-width: 899px)', () => {
+      cards.forEach((card, i) => ScrollTrigger.create({ trigger: card, start: 'top 75%', once: true, onEnter: () => visuals[i].play() }));
     });
   });
   return (
@@ -160,43 +185,14 @@ const HowItWorks = () => {
                 <p>{step.copy}</p>
                 <p className="tag">In development</p>
               </div>
-              <div className="spec">
-                <p className="spec-head"><span>{step.name}</span><span>Illustrative example</span></p>
-                <dl aria-label={`Illustrative ${step.name.toLowerCase()} example`}>
-                  {step.rows.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}
-                </dl>
-              </div>
+              <div className="step-visual">{(() => { const Visual = illustrations[i]; return <Visual />; })()}</div>
             </article>
           ))}
         </div>
       </div>
-    </section>
-  );
-};
-
-const Principles = () => {
-  const ref = useRef<HTMLElement>(null);
-  useGsap(ref, root => {
-    revealLines(root.querySelector('h2')!, { scrollTrigger: { trigger: root, start: 'top 70%' } });
-    gsap.from('.principle', { y: 60, opacity: 0, duration: 1.2, ease: EASE, stagger: 0.1, scrollTrigger: { trigger: '.principles-grid', start: 'top 80%' } });
-    gsap.utils.toArray<HTMLElement>('.strike', root).forEach(line => {
-      gsap.from(line, { scaleX: 0, duration: 1, ease: 'power3.inOut', scrollTrigger: { trigger: line, start: 'top 75%' } });
-    });
-  });
-  return (
-    <section className="section principles" ref={ref} aria-labelledby="principles-title">
-      <div className="wrap section-head">
-        <div><p className="eyebrow">Our principles</p><h2 id="principles-title">Built against the noise.</h2></div>
-        <p>Prospect is being built around process, evidence and risk. <a className="text-link" href="/portfolio-risk-management/">Explore portfolio risk →</a></p>
-      </div>
-      <div className="wrap principles-grid">
-        {principles.map(([topic, them, us]) => (
-          <SpotlightCard key={topic} className="principle" spotlightColor="rgba(43, 196, 138, 0.16)" intensity={0.8} spotlightSize={420} borderGlow={0.5} theme="dark">
-            <p className="principle-topic">{topic}</p>
-            <p className="them"><span className="sr-only">Common in retail trading tools: </span>{them}<span className="strike" aria-hidden="true" /></p>
-            <p className="us"><span className="sr-only">What Prospect is being built for: </span>{us}</p>
-          </SpotlightCard>
-        ))}
+      <div className="wrap mid-cta">
+        <p>Want to be first to try it?</p>
+        <Magnet padding={60} magnetStrength={5} maxOffset={10}><a className="btn btn-solid btn-lg" href="#waitlist">Join the waitlist <Arrow /></a></Magnet>
       </div>
     </section>
   );
@@ -253,6 +249,7 @@ const Faq = () => {
 const Closing = () => {
   const ref = useRef<HTMLElement>(null);
   useGsap(ref, root => {
+    gsap.from('.benefits li', { y: 30, opacity: 0, duration: 1, ease: EASE, stagger: 0.1, scrollTrigger: { trigger: '.benefits', start: 'top 85%' } });
     gsap.fromTo('.closing-card', { clipPath: 'inset(12% 8% 12% 8% round 40px)' }, { clipPath: 'inset(0% 0% 0% 0% round 28px)', ease: 'none', scrollTrigger: { trigger: root, start: 'top bottom', end: 'top 25%', scrub: true } });
     revealLines(root.querySelector('h2')!, { scrollTrigger: { trigger: root, start: 'top 55%' } });
   });
@@ -263,10 +260,15 @@ const Closing = () => {
           <div className="closing-bg" aria-hidden="true"><DarkVeil color="#1f8f66" speed={0.25} scale={1.3} flow={0.8} brightness={0.85} glow={0.35} grain={0.04} fade={0.3} mouseInteraction={false} /></div>
           <div className="closing-copy">
             <p className="eyebrow">The waitlist</p>
-            <h2>Be part of what comes next.</h2>
-            <p>Join the Prospect waitlist for launch and early-access news. No account. No trading credentials.</p>
+            <h2>Get in early.</h2>
+            <p>Early members get the first invitations and a direct line to the founder while Prospect takes shape. Free to join. One email address. Nothing else.</p>
           </div>
-          <Waitlist suffix="-end" />
+          <div className="closing-form">
+            <Waitlist suffix="-end" />
+          </div>
+          <ol className="benefits">
+            {perks.map((perk, i) => <li key={perk}><span>0{i + 1}</span>{perk}</li>)}
+          </ol>
         </div>
       </div>
     </section>
@@ -312,10 +314,9 @@ export const App = () => {
         <Manifesto />
         <Product />
         <HowItWorks />
-        <Principles />
         <Founder />
-        <Faq />
         <Closing />
+        <Faq />
       </main>
       <Footer />
       <div className="grain" aria-hidden="true" />

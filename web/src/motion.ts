@@ -29,7 +29,7 @@ export const useSmoothScroll = () => {
   useEffect(() => {
     if (prefersReducedMotion()) return;
     document.documentElement.classList.add('lenis');
-    const lenis = new Lenis({ lerp: 0.085, wheelMultiplier: 0.9, anchors: { offset: -72 } });
+    const lenis = new Lenis({ duration: 1.35, easing: t => 1 - Math.pow(1 - t, 4), smoothWheel: true, wheelMultiplier: 1, touchMultiplier: 1.4, anchors: { offset: -72, duration: 1.8 } });
     lenis.on('scroll', ScrollTrigger.update);
     const tick = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(tick);
