@@ -91,7 +91,8 @@ test('rejects malformed, oversized and non-JSON submissions without leaking form
     assert.equal((await request('email=private%40example.com', 'application/x-www-form-urlencoded')).status, 415);
     assert.equal((await fetch(app.url + '/api/waitlist')).status, 405);
     const html = await (await fetch(app.url)).text();
-    assert.match(html, /<form id="waitlist-form" method="post" action="\/api\/waitlist">/);
+    assert.match(html, /<form id="waitlist-form"[^>]*action="\/api\/waitlist"[^>]*>/);
+    assert.match(html.match(/<form id="waitlist-form"[^>]*>/)[0], /method="post"/);
   } finally { await app.close(); rmSync(folder, { recursive: true }); }
 });
 test('cross-origin collector accepts only configured public sites, including preflight', async () => {
