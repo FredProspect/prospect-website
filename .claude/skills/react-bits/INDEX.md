@@ -1,0 +1,231 @@
+## TextAnimations
+- **ASCIIText** — `TextAnimations/ASCIIText/` — deps: none
+- **BlurText** — `TextAnimations/BlurText/` — deps: motion/react 
+- **CircularText** — `TextAnimations/CircularText/` — deps: motion/react 
+- **CountUp** — `TextAnimations/CountUp/` — deps: motion/react 
+- **CurvedLoop** — `TextAnimations/CurvedLoop/` — deps: none
+- **DecryptedText** — `TextAnimations/DecryptedText/` — deps: motion/react 
+- **DepthText** — `TextAnimations/DepthText/` — deps: none
+- **EchoText** — `TextAnimations/EchoText/` — deps: none
+- **FallingText** — `TextAnimations/FallingText/` — deps: matter-js 
+- **FoldText** — `TextAnimations/FoldText/` — deps: gsap gsap/ScrollTrigger 
+- **FuzzyText** — `TextAnimations/FuzzyText/` — deps: none
+- **GlitchText** — `TextAnimations/GlitchText/` — deps: none
+- **GradientText** — `TextAnimations/GradientText/` — deps: none
+- **MaskedHeading** — `TextAnimations/MaskedHeading/` — deps: gsap 
+- **ParticleText** — `TextAnimations/ParticleText/` — deps: none
+- **RotatingText** — `TextAnimations/RotatingText/` — deps: motion/react 
+- **ScrambledText** — `TextAnimations/ScrambledText/` — deps: gsap gsap/ScrambleTextPlugin gsap/SplitText 
+- **ScrollFloat** — `TextAnimations/ScrollFloat/` — deps: gsap gsap/ScrollTrigger 
+- **ScrollReveal** — `TextAnimations/ScrollReveal/` — deps: gsap gsap/ScrollTrigger 
+- **ScrollVelocity** — `TextAnimations/ScrollVelocity/` — deps: motion/react 
+- **ShinyText** — `TextAnimations/ShinyText/` — deps: none
+- **Shuffle** — `TextAnimations/Shuffle/` — deps: @gsap/react gsap gsap/ScrollTrigger gsap/SplitText 
+- **SplitFlapText** — `TextAnimations/SplitFlapText/` — deps: none
+- **SplitText** — `TextAnimations/SplitText/` — deps: @gsap/react gsap gsap/ScrollTrigger gsap/SplitText 
+- **StrokeText** — `TextAnimations/StrokeText/` — deps: gsap gsap/ScrollTrigger 
+- **TechText** — `TextAnimations/TechText/` — deps: none
+- **TextCursor** — `TextAnimations/TextCursor/` — deps: none
+- **TextLoop** — `TextAnimations/TextLoop/` — deps: gsap 
+- **TextPressure** — `TextAnimations/TextPressure/` — deps: none
+- **TextType** — `TextAnimations/TextType/` — deps: gsap 
+- **TrueFocus** — `TextAnimations/TrueFocus/` — deps: motion/react 
+- **VariableProximity** — `TextAnimations/VariableProximity/` — deps: none
+- **WarpText** — `TextAnimations/WarpText/` — deps: ogl 
+
+## Animations
+- **AnimatedContent** — `Animations/AnimatedContent/` — deps: gsap gsap/ScrollTrigger 
+- **BlobCursor** — `Animations/BlobCursor/` — deps: three three/examples/jsm/environments/RoomEnvironment.js 
+- **ClickSpark** — `Animations/ClickSpark/` — deps: none
+- **Crosshair** — `Animations/Crosshair/` — deps: none
+- **CrystalizedBall** — `Animations/CrystalizedBall/` — deps: ogl 
+- **Cubes** — `Animations/Cubes/` — deps: none
+- **CursorGrid** — `Animations/CursorGrid/` — deps: none
+- **DitherVeil** — `Animations/DitherVeil/` — deps: ogl 
+- **ElasticMesh** — `Animations/ElasticMesh/` — deps: none
+- **ElectricBorder** — `Animations/ElectricBorder/` — deps: none
+- **ElectricLogo** — `Animations/ElectricLogo/` — deps: ogl 
+- **FadeContent** — `Animations/FadeContent/` — deps: gsap gsap/ScrollTrigger 
+- **GhostCursor** — `Animations/GhostCursor/` — deps: none
+- **GlareHover** — `Animations/GlareHover/` — deps: none
+- **GlowCursor** — `Animations/GlowCursor/` — deps: none
+- **GradualBlur** — `Animations/GradualBlur/` — deps: none
+- **HalftoneReveal** — `Animations/HalftoneReveal/` — deps: none
+- **ImageTrail** — `Animations/ImageTrail/` — deps: gsap 
+- **LaserFlow** — `Animations/LaserFlow/` — deps: none
+- **LogoLoop** — `Animations/LogoLoop/` — deps: none
+- **Magnet** — `Animations/Magnet/` — deps: none
+- **MetaBalls** — `Animations/MetaBalls/` — deps: none
+- **MetallicPaint** — `Animations/MetallicPaint/` — deps: none
+- **NeonLogo** — `Animations/NeonLogo/` — deps: none
+- **Noise** — `Animations/Noise/` — deps: none
+- **OrbitImages** — `Animations/OrbitImages/` — deps: none
+- **PixelSwap** — `Animations/PixelSwap/` — deps: none
+- **PixelTrail** — `Animations/PixelTrail/` — deps: none
+- **PixelTransition** — `Animations/PixelTransition/` — deps: none
+- **Ribbons** — `Animations/Ribbons/` — deps: none
+- **RippleDistortion** — `Animations/RippleDistortion/` — deps: ogl 
+- **ScrollExpand** — `Animations/ScrollExpand/` — deps: none
+- **ShapeBlur** — `Animations/ShapeBlur/` — deps: none
+- **SplashCursor** — `Animations/SplashCursor/` — deps: none
+- **StarBorder** — `Animations/StarBorder/` — deps: none
+- **StickerPeel** — `Animations/StickerPeel/` — deps: none
+- **Strands** — `Animations/Strands/` — deps: none
+- **SwarmCursor** — `Animations/SwarmCursor/` — deps: none
+- **TargetCursor** — `Animations/TargetCursor/` — deps: react-dom 
+
+## Backgrounds
+- **AcidSquares** — `Backgrounds/AcidSquares/` — deps: none
+- **AeroShards** — `Backgrounds/AeroShards/` — deps: vgpu 
+- **Antigravity** — `Backgrounds/Antigravity/` — deps: none
+- **Aurora** — `Backgrounds/Aurora/` — deps: none
+- **Balatro** — `Backgrounds/Balatro/` — deps: none
+- **Ballpit** — `Backgrounds/Ballpit/` — deps: none
+- **Beams** — `Backgrounds/Beams/` — deps: none
+- **CRTWarp** — `Backgrounds/CRTWarp/` — deps: none
+- **ColorBends** — `Backgrounds/ColorBends/` — deps: three 
+- **DarkVeil** — `Backgrounds/DarkVeil/` — deps: none
+- **Dither** — `Backgrounds/Dither/` — deps: none
+- **DotField** — `Backgrounds/DotField/` — deps: none
+- **DotGrid** — `Backgrounds/DotGrid/` — deps: none
+- **EvilEye** — `Backgrounds/EvilEye/` — deps: ogl 
+- **FaultyTerminal** — `Backgrounds/FaultyTerminal/` — deps: none
+- **Ferrofluid** — `Backgrounds/Ferrofluid/` — deps: none
+- **FloatingLines** — `Backgrounds/FloatingLines/` — deps: none
+- **FluxLines** — `Backgrounds/FluxLines/` — deps: none
+- **Galaxy** — `Backgrounds/Galaxy/` — deps: none
+- **GhostFibers** — `Backgrounds/GhostFibers/` — deps: none
+- **GradientASCII** — `Backgrounds/GradientASCII/` — deps: none
+- **GradientBlinds** — `Backgrounds/GradientBlinds/` — deps: none
+- **GradientWaves** — `Backgrounds/GradientWaves/` — deps: none
+- **Grainient** — `Backgrounds/Grainient/` — deps: none
+- **GridDistortion** — `Backgrounds/GridDistortion/` — deps: none
+- **GridMotion** — `Backgrounds/GridMotion/` — deps: none
+- **GridScan** — `Backgrounds/GridScan/` — deps: none
+- **HoloMosaic** — `Backgrounds/HoloMosaic/` — deps: none
+- **Hyperspeed** — `Backgrounds/Hyperspeed/` — deps: three 
+- **Iridescence** — `Backgrounds/Iridescence/` — deps: none
+- **LetterGlitch** — `Backgrounds/LetterGlitch/` — deps: none
+- **LightPillar** — `Backgrounds/LightPillar/` — deps: none
+- **LightRays** — `Backgrounds/LightRays/` — deps: none
+- **LightTunnel** — `Backgrounds/LightTunnel/` — deps: none
+- **Lightfall** — `Backgrounds/Lightfall/` — deps: none
+- **Lightning** — `Backgrounds/Lightning/` — deps: none
+- **LineWaves** — `Backgrounds/LineWaves/` — deps: none
+- **LiquidChrome** — `Backgrounds/LiquidChrome/` — deps: none
+- **LiquidEther** — `Backgrounds/LiquidEther/` — deps: none
+- **MagicRings** — `Backgrounds/MagicRings/` — deps: none
+- **MagnetLines** — `Backgrounds/MagnetLines/` — deps: none
+- **MicroSlats** — `Backgrounds/MicroSlats/` — deps: ogl 
+- **MoltenMetal** — `Backgrounds/MoltenMetal/` — deps: none
+- **NeonGlyphs** — `Backgrounds/NeonGlyphs/` — deps: none
+- **Orb** — `Backgrounds/Orb/` — deps: none
+- **Particles** — `Backgrounds/Particles/` — deps: none
+- **PatternWaves** — `Backgrounds/PatternWaves/` — deps: ogl 
+- **PixelBlast** — `Backgrounds/PixelBlast/` — deps: none
+- **PixelSnow** — `Backgrounds/PixelSnow/` — deps: none
+- **Plasma** — `Backgrounds/Plasma/` — deps: none
+- **PlasmaWave** — `Backgrounds/PlasmaWave/` — deps: none
+- **Prism** — `Backgrounds/Prism/` — deps: none
+- **PrismaticBurst** — `Backgrounds/PrismaticBurst/` — deps: none
+- **Radar** — `Backgrounds/Radar/` — deps: none
+- **RippleGrid** — `Backgrounds/RippleGrid/` — deps: none
+- **Scanner** — `Backgrounds/Scanner/` — deps: none
+- **ShapeGrid** — `Backgrounds/ShapeGrid/` — deps: none
+- **ShapeWaves** — `Backgrounds/ShapeWaves/` — deps: vgpu 
+- **SideRays** — `Backgrounds/SideRays/` — deps: none
+- **Silk** — `Backgrounds/Silk/` — deps: none
+- **SlicedWaves** — `Backgrounds/SlicedWaves/` — deps: none
+- **SoftAurora** — `Backgrounds/SoftAurora/` — deps: none
+- **Threads** — `Backgrounds/Threads/` — deps: none
+- **Topography** — `Backgrounds/Topography/` — deps: none
+- **Waves** — `Backgrounds/Waves/` — deps: none
+- **WebThreads** — `Backgrounds/WebThreads/` — deps: none
+
+## Components
+- **AccordionGallery** — `Components/AccordionGallery/` — deps: gsap 
+- **AnimatedList** — `Components/AnimatedList/` — deps: @hugeicons/core-free-icons @hugeicons/react 
+- **BorderGlow** — `Components/BorderGlow/` — deps: none
+- **BounceCards** — `Components/BounceCards/` — deps: none
+- **BubbleMenu** — `Components/BubbleMenu/` — deps: gsap 
+- **CardNav** — `Components/CardNav/` — deps: @hugeicons/core-free-icons @hugeicons/react 
+- **CardSwap** — `Components/CardSwap/` — deps: @hugeicons/core-free-icons @hugeicons/react 
+- **Carousel** — `Components/Carousel/` — deps: @hugeicons/core-free-icons @hugeicons/react 
+- **ChromaGrid** — `Components/ChromaGrid/` — deps: none
+- **CircularCarousel** — `Components/CircularCarousel/` — deps: none
+- **CircularGallery** — `Components/CircularGallery/` — deps: none
+- **Counter** — `Components/Counter/` — deps: none
+- **CurvedInput** — `Components/CurvedInput/` — deps: none
+- **DecayCard** — `Components/DecayCard/` — deps: none
+- **DepthCarousel** — `Components/DepthCarousel/` — deps: gsap 
+- **Dock** — `Components/Dock/` — deps: react-dom 
+- **DomeGallery** — `Components/DomeGallery/` — deps: @use-gesture/react 
+- **DriftWall** — `Components/DriftWall/` — deps: none
+- **ElasticSlider** — `Components/ElasticSlider/` — deps: @hugeicons/core-free-icons @hugeicons/react 
+- **FlexCarousel** — `Components/FlexCarousel/` — deps: ogl 
+- **FlowingMenu** — `Components/FlowingMenu/` — deps: @hugeicons/core-free-icons @hugeicons/react 
+- **FluidGlass** — `Components/FluidGlass/` — deps: none
+- **FlyingPosters** — `Components/FlyingPosters/` — deps: none
+- **Folder** — `Components/Folder/` — deps: none
+- **GlassIcons** — `Components/GlassIcons/` — deps: none
+- **GlassSurface** — `Components/GlassSurface/` — deps: none
+- **GooeyNav** — `Components/GooeyNav/` — deps: none
+- **HoloCard** — `Components/HoloCard/` — deps: none
+- **InfiniteMenu** — `Components/InfiniteMenu/` — deps: none
+- **InfiniteSpiral** — `Components/InfiniteSpiral/` — deps: none
+- **Lanyard** — `Components/Lanyard/` — deps: three 
+- **LineSidebar** — `Components/LineSidebar/` — deps: none
+- **MagicBento** — `Components/MagicBento/` — deps: @hugeicons/core-free-icons @hugeicons/react 
+- **Masonry** — `Components/Masonry/` — deps: @hugeicons/core-free-icons @hugeicons/react react-dom 
+- **ModelViewer** — `Components/ModelViewer/` — deps: @react-three/drei @react-three/fiber three three/examples/jsm/loaders/OBJLoader.js 
+- **MorphSlider** — `Components/MorphSlider/` — deps: gsap ogl 
+- **OptionWheel** — `Components/OptionWheel/` — deps: none
+- **PillNav** — `Components/PillNav/` — deps: none
+- **PixelCard** — `Components/PixelCard/` — deps: none
+- **ProfileCard** — `Components/ProfileCard/` — deps: @hugeicons/core-free-icons @hugeicons/react 
+- **ReflectiveCard** — `Components/ReflectiveCard/` — deps: @hugeicons/core-free-icons @hugeicons/react 
+- **ScrollStack** — `Components/ScrollStack/` — deps: none
+- **SpecularButton** — `Components/SpecularButton/` — deps: none
+- **SpotlightCard** — `Components/SpotlightCard/` — deps: none
+- **Stack** — `Components/Stack/` — deps: motion/react 
+- **StaggeredMenu** — `Components/StaggeredMenu/` — deps: gsap 
+- **Stepper** — `Components/Stepper/` — deps: @hugeicons/core-free-icons @hugeicons/react 
+- **TiltedCard** — `Components/TiltedCard/` — deps: none
+
+## Micro
+- **BellToggle** — `Micro/BellToggle/` — deps: @hugeicons/core-free-icons @hugeicons/react motion/react 
+- **BranchedMenu** — `Micro/BranchedMenu/` — deps: @hugeicons/core-free-icons @hugeicons/react 
+- **CallChip** — `Micro/CallChip/` — deps: @hugeicons/core-free-icons @hugeicons/react 
+- **CodeSlots** — `Micro/CodeSlots/` — deps: @hugeicons/core-free-icons @hugeicons/react motion/react 
+- **CometDial** — `Micro/CometDial/` — deps: motion/react 
+- **DodgeField** — `Micro/DodgeField/` — deps: motion/react 
+- **FlipCard** — `Micro/FlipCard/` — deps: motion/react 
+- **FlyingButton** — `Micro/FlyingButton/` — deps: none
+- **FolderFloat** — `Micro/FolderFloat/` — deps: matter-js 
+- **FuseButton** — `Micro/FuseButton/` — deps: @hugeicons/core-free-icons @hugeicons/react 
+- **GlideSelect** — `Micro/GlideSelect/` — deps: @hugeicons/core-free-icons @hugeicons/react 
+- **HoldButton** — `Micro/HoldButton/` — deps: none
+- **JellyRadio** — `Micro/JellyRadio/` — deps: motion/react 
+- **LatticeLoader** — `Micro/LatticeLoader/` — deps: none
+- **PaperCrumple** — `Micro/PaperCrumple/` — deps: three 
+- **PeekRating** — `Micro/PeekRating/` — deps: @hugeicons/core-free-icons @hugeicons/react 
+- **PromptBar** — `Micro/PromptBar/` — deps: @hugeicons/core-free-icons @hugeicons/react motion/react 
+- **PulseHeart** — `Micro/PulseHeart/` — deps: @hugeicons/core-free-icons 
+- **RefineFrame** — `Micro/RefineFrame/` — deps: @hugeicons/core-free-icons @hugeicons/react 
+- **RubberSegment** — `Micro/RubberSegment/` — deps: motion/react 
+- **ScrubField** — `Micro/ScrubField/` — deps: motion/react 
+- **Shredder** — `Micro/Shredder/` — deps: react-dom 
+- **SlideCommit** — `Micro/SlideCommit/` — deps: @hugeicons/core-free-icons @hugeicons/react motion/react 
+- **SlingButton** — `Micro/SlingButton/` — deps: @hugeicons/core-free-icons @hugeicons/react motion/react 
+- **SloshGauge** — `Micro/SloshGauge/` — deps: none
+- **SpringCheck** — `Micro/SpringCheck/` — deps: @hugeicons/core-free-icons motion/react 
+- **SquishSwitch** — `Micro/SquishSwitch/` — deps: motion/react 
+- **StatusMark** — `Micro/StatusMark/` — deps: motion/react 
+- **SwipeRow** — `Micro/SwipeRow/` — deps: @hugeicons/core-free-icons @hugeicons/react motion/react 
+- **SwipeToast** — `Micro/SwipeToast/` — deps: @hugeicons/core-free-icons @hugeicons/react motion/react 
+- **TearTicket** — `Micro/TearTicket/` — deps: motion/react 
+- **ThoughtLine** — `Micro/ThoughtLine/` — deps: @hugeicons/core-free-icons @hugeicons/react motion/react 
+- **VoicePill** — `Micro/VoicePill/` — deps: @hugeicons/core-free-icons @hugeicons/react 
+- **WakeSlider** — `Micro/WakeSlider/` — deps: motion/react 
+- **WarmTooltip** — `Micro/WarmTooltip/` — deps: motion/react react-dom 
+
