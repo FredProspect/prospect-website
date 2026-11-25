@@ -1,5 +1,19 @@
 # Prospect
 
-Pre-launch AI-native trading research for independent traders. Product previews are prototypes. No execution, fund management or performance promises.
+> Prospect is a pre-launch, AI-assisted trading research platform for independent traders (retail, prop and systematic). You describe a strategy idea in plain English; Prospect is being built to turn it into explicit rules, backtest it honestly with costs and slippage, flag when live behaviour drifts, and show risk across every strategy you run. Prospect does not execute trades, manage money or promise returns. It is in development; a waitlist is open and some members will be selected as beta testers.
 
-https://prospectpartnership.co.uk/
+Company: Prospect Partnership Ltd, Company No. 15277481, England & Wales. Founder: Fred Boxer.
+
+## Product
+- [Homepage and waitlist](https://prospectpartnership.co.uk/): overview, prototype screens, how it works, FAQ
+- [Product](https://prospectpartnership.co.uk/product/): the connected research workflow
+
+## Guides
+- [AI trading strategy builder](https://prospectpartnership.co.uk/ai-trading-strategy-builder/): turning ideas into testable rules
+- [How to backtest a trading strategy](https://prospectpartnership.co.uk/trading-strategy-backtesting/): costs, overfitting and out-of-sample checks
+- [Strategy monitoring](https://prospectpartnership.co.uk/strategy-monitoring/): spotting drift between live behaviour and expectations
+- [Portfolio risk management](https://prospectpartnership.co.uk/portfolio-risk-management/): correlation and shared exposure across strategies
+
+## Company
+- [About](https://prospectpartnership.co.uk/about/)
+- [Privacy](https://prospectpartnership.co.uk/privacy/)

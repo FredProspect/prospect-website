@@ -215,6 +215,8 @@ export function createApp(config = {}) {
     res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://prospect-public-website-staging.up.railway.app; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
     const url = new URL(req.url, origin);
     if (url.pathname.startsWith('/api/waitlist')) return waitlistApi(req, res, url);
+    // This service also answers on its Railway domain; keep that copy of the site out of search results.
+    if (req.headers.host && req.headers.host !== new URL(origin).host) res.setHeader('X-Robots-Tag', 'noindex, nofollow');
     if (!['GET', 'HEAD'].includes(req.method)) return reply(res, 405, { error: 'Method not allowed.' });
     let path;
     try { path = decodeURIComponent(url.pathname); } catch { return reply(res, 400, { error: 'Invalid path.' }); }

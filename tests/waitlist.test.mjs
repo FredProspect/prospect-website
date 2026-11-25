@@ -200,3 +200,27 @@ test('a failing email provider never blocks a signup', async () => {
     assert.equal((await res.json()).referral.confirmed, false);
   } finally { await app.close(); rmSync(folder, { recursive: true }); }
 });
+test('SEO: unique keyword titles, redirects for retired URLs, structured data, no duplicate host', async () => {
+  const app = await start();
+  const { readFileSync } = await import('node:fs');
+  try {
+    const routes = [...readFileSync('dist/sitemap.xml', 'utf8').matchAll(/<loc>https:\/\/prospectpartnership.co.uk([^<]+)<\/loc>/g)].map(m => m[1]);
+    const titles = new Set();
+    for (const route of routes) {
+      const html = await (await fetch(app.url + route)).text();
+      const title = html.match(/<title>([^<]+)<\/title>/)[1];
+      const description = html.match(/name="description" content="([^"]+)"/)[1];
+      assert.ok(title.length <= 65, `${route}: title ${title.length} chars`);
+      assert.ok(description.length <= 160, `${route}: description ${description.length} chars`);
+      assert.ok(!titles.has(title), `${route}: duplicate title`);
+      titles.add(title);
+      assert.doesNotMatch(html, /noindex/, `${route} is in the sitemap but noindexed`);
+    }
+    const home = await (await fetch(app.url + '/')).text();
+    for (const type of ['Organization', 'WebSite', 'WebPage', 'FAQPage']) assert.match(home, new RegExp(`"@type":"${type}"`), type);
+    const retired = await (await fetch(app.url + '/investors/')).text();
+    assert.match(retired, /http-equiv="refresh" content="0; url=\/about\/"/);
+    assert.match(retired, /rel="canonical" href="https:\/\/prospectpartnership.co.uk\/about\/"/);
+    assert.equal((await fetch(app.url + '/')).headers.get('x-robots-tag'), 'noindex, nofollow', 'non-canonical host is noindexed');
+  } finally { await app.close(); }
+});
