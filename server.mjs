@@ -42,11 +42,12 @@ const RANKED = `WITH scored AS (
   SELECT s.*, (SELECT COUNT(*) FROM scored o WHERE o.referrals > s.referrals OR (o.referrals = s.referrals AND o.created_at < s.created_at)) + 1 AS position
   FROM scored s`;
 
+// Members see a tier, never their exact place or the list size: 0-2 referrals low, 3-4 medium, 5+ high.
+export const tierFor = referrals => (referrals >= 5 ? 'high' : referrals >= 3 ? 'medium' : 'low');
+
 export function standingFor(db, code) {
-  const row = db.prepare(`${RANKED} WHERE s.referral_code = ?`).get(code);
-  if (!row) return null;
-  const { total } = db.prepare('SELECT COUNT(*) AS total FROM waitlist').get();
-  return { code: row.referral_code, position: row.position, total, referrals: row.referrals };
+  const row = db.prepare('SELECT referral_code, (SELECT COUNT(*) FROM waitlist r WHERE r.referred_by = w.referral_code) AS referrals FROM waitlist w WHERE referral_code = ?').get(code);
+  return row ? { code: row.referral_code, referrals: row.referrals, tier: tierFor(row.referrals) } : null;
 }
 
 export function exportCsv(db) {

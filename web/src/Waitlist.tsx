@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { EMAIL } from './content';
 
 type Status = { tone: 'idle' | 'busy' | 'done' | 'error'; message: string };
-export type Standing = { code: string; position: number; total: number; referrals: number };
+export type Standing = { code: string; referrals: number; tier: 'low' | 'medium' | 'high' };
 
 const SITE = 'https://prospectpartnership.co.uk/';
 const CODE_KEY = 'prospect-referral-code';
@@ -27,7 +27,11 @@ const describeError = (error: unknown) => {
   return error.message;
 };
 
-const ordinalPlace = (n: number) => `#${n.toLocaleString('en-GB')}`;
+const TIERS = {
+  low: { label: 'Low on the list', step: 1, next: (r: number) => `Refer ${3 - r} more ${3 - r === 1 ? 'friend' : 'friends'} to move to the middle of the list.` },
+  medium: { label: 'Middle of the list', step: 2, next: (r: number) => `Refer ${5 - r} more ${5 - r === 1 ? 'friend' : 'friends'} to move high up the list.` },
+  high: { label: 'High up the list', step: 3, next: () => 'You’re among the first in line for beta invitations. Keep sharing to stay there.' }
+} as const;
 
 /** Shared by both forms: every Waitlist instance on the page shows the same standing. */
 const listeners = new Set<(standing: Standing | null) => void>();
@@ -35,6 +39,7 @@ const broadcast = (standing: Standing | null) => listeners.forEach(listener => l
 
 const ReferralCard = ({ standing, onReset, suffix }: { standing: Standing; onReset: () => void; suffix: string }) => {
   const link = `${SITE}?ref=${standing.code}`;
+  const tier = TIERS[standing.tier] ?? TIERS.low;
   const [copied, setCopied] = useState(false);
   const copy = async () => {
     try { await navigator.clipboard.writeText(link); setCopied(true); setTimeout(() => setCopied(false), 2200); }
@@ -45,10 +50,11 @@ const ReferralCard = ({ standing, onReset, suffix }: { standing: Standing; onRes
   return (
     <div className="referral-card" role="region" aria-label="Your waitlist place">
       <p className="referral-eyebrow">You’re on the list</p>
-      <p className="referral-place"><span>{ordinalPlace(standing.position)}</span> of {standing.total.toLocaleString('en-GB')}</p>
+      <p className="referral-place">{tier.label}</p>
+      <div className="tier-meter" aria-hidden="true">{[1, 2, 3].map(step => <span key={step} className={step <= tier.step ? 'is-on' : ''} />)}</div>
       <p className="referral-copy">
-        Every person who joins with your link moves you up. Beta invitations go to the top of the list first.
-        {standing.referrals > 0 && <> You’ve referred <strong>{standing.referrals}</strong> so far.</>}
+        <strong>{tier.next(standing.referrals)}</strong> Beta invitations go to the top of the list first.
+        {standing.referrals > 0 && <> You’ve referred {standing.referrals} so far.</>}
       </p>
       <div className="referral-link">
         <label className="sr-only" htmlFor={`referral-link${suffix}`}>Your referral link</label>

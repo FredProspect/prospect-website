@@ -59,7 +59,8 @@ try {
     await page.waitForSelector('.referral-card');
     const link = await page.locator('.hero .referral-link input').inputValue();
     assert.match(link, /\?ref=[A-HJKMNP-Z2-9]{8}$/, 'referral link shown after joining');
-    assert.match(await page.locator('.hero .referral-place').textContent(), /#\d+ of \d+/);
+    assert.equal(await page.locator('.hero .referral-place').textContent(), 'Low on the list');
+    assert.doesNotMatch(await page.locator('.hero .referral-card').textContent(), /#\d| of \d/, 'no position or total shown');
     const referralAxe = await new AxeBuilder({ page }).include('.referral-card').withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze();
     assert.equal(referralAxe.violations.length, 0, JSON.stringify(referralAxe.violations.map(v => v.id)));
     // A friend arriving through the link is credited, and the referrer moves up.

@@ -123,19 +123,23 @@ test('referrals: legacy rows migrate, referrers move up, codes are validated, ex
     const status = code => fetch(`${app.url}/api/waitlist/status?code=${code}`);
     const late = await join_('late@example.com');
     assert.match(late.code, /^[A-HJKMNP-Z2-9]{8}$/);
-    assert.equal(late.position, 2, 'joins behind the existing member');
-    assert.equal(late.total, 2);
+    assert.deepEqual(Object.keys(late).sort(), ['code', 'referrals', 'tier'], 'no position or list size is exposed');
+    assert.equal(late.tier, 'low');
     const early = new DatabaseSync(dbPath, { readOnly: true }).prepare('SELECT referral_code FROM waitlist WHERE email = ?').get('early@example.com');
     assert.match(early.referral_code, /^[A-HJKMNP-Z2-9]{8}$/, 'legacy row received a code');
 
     const friend = await join_('friend@example.com', late.code.toLowerCase());
-    assert.equal(friend.position, 3);
+    assert.equal(friend.referrals, 0);
     const moved = (await (await status(late.code)).json()).referral;
-    assert.deepEqual([moved.position, moved.referrals], [1, 1], 'one referral moves the referrer to the front');
+    assert.deepEqual([moved.referrals, moved.tier], [1, 'low']);
+    for (const n of [2, 3]) await join_(`more${n}@example.com`, late.code);
+    assert.equal((await (await status(late.code)).json()).referral.tier, 'medium', 'three referrals reach the middle');
+    for (const n of [4, 5]) await join_(`more${n}@example.com`, late.code);
+    assert.equal((await (await status(late.code)).json()).referral.tier, 'high', 'five referrals are high up');
 
     await join_('ghost@example.com', 'ZZZZZZZZ');
     await join_('late@example.com', late.code);
-    assert.equal((await (await status(late.code)).json()).referral.referrals, 1, 'unknown codes and repeat signups do not count');
+    assert.equal((await (await status(late.code)).json()).referral.referrals, 5, 'unknown codes and repeat signups do not count');
     assert.equal((await status('not-a-code')).status, 404);
 
     assert.equal((await fetch(`${app.url}/api/waitlist/export`)).status, 401);
@@ -143,8 +147,8 @@ test('referrals: legacy rows migrate, referrers move up, codes are validated, ex
     const csv = await (await fetch(`${app.url}/api/waitlist/export`, { headers: { Authorization: `Bearer ${adminToken}` } })).text();
     const lines = csv.trim().split('\n');
     assert.match(lines[0], /^position,email,referrals/);
-    assert.match(lines[1], /^"1","late@example.com","1"/);
-    assert.equal(lines.length, 5);
+    assert.match(lines[1], /^"1","late@example.com","5"/, 'admin export keeps exact ranking');
+    assert.equal(lines.length, 9);
   } finally { await app.close(); rmSync(folder, { recursive: true }); }
 });
 test('export endpoint does not exist without an admin token', async () => {
