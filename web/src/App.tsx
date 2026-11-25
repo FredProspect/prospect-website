@@ -31,7 +31,7 @@ const Header = () => {
       <div className="nav">
         <a className="brand" href="/" aria-label="Prospect home"><img src="/assets/prospect-lockup-dark.png" width="138" height="32" alt="Prospect" /></a>
         <nav className="nav-links" aria-label="Primary">
-          <a href="#product">Product</a><a href="#how-it-works">How it works</a><a href="#about">About</a><a href={`mailto:${EMAIL}`}>Contact</a>
+          <a href="#product">Product</a><a href="#how-it-works">How it works</a><a href="/insights/">Guides</a><a href="#about">About</a><a href={`mailto:${EMAIL}`}>Contact</a>
         </nav>
         <Magnet padding={40} magnetStrength={4} maxOffset={8} wrapperClassName="nav-cta-wrap">
           <a className="btn btn-solid btn-sm" href="#waitlist">Get early access <Arrow /></a>
@@ -285,7 +285,7 @@ const Footer = () => {
       <div className="wrap">
         <div className="footer-top">
           <p className="footer-tag">Sophisticated trading intelligence, made accessible.</p>
-          <nav className="footer-col" aria-label="Explore"><p className="footer-label">Explore</p><a href="#product">The product</a><a href="#how-it-works">How it works</a><a href="#about">Meet the founder</a><a href="/insights/">Research essentials</a><a href="#waitlist">Join the waitlist</a></nav>
+          <nav className="footer-col" aria-label="Explore"><p className="footer-label">Explore</p><a href="#product">The product</a><a href="#how-it-works">How it works</a><a href="#about">Meet the founder</a><a href="/insights/">Trading research guides</a><a href="/systematic-trading/">Systematic trading</a><a href="/trading-strategy-backtesting/">How to backtest a strategy</a><a href="/ai-trading-strategy-builder/">AI strategy builder</a><a href="#waitlist">Join the waitlist</a></nav>
           <nav className="footer-col" aria-label="Company"><p className="footer-label">Company</p><a href={`mailto:${EMAIL}`}>Email Prospect</a><a href={LINKEDIN} rel="noopener noreferrer" target="_blank">Fred Boxer on LinkedIn</a><a href="/privacy/">Privacy notice</a><a href="/terms/">Website terms</a><a href="/accessibility/">Accessibility</a><a href="/cookies/">Cookies</a></nav>
         </div>
         <p className="wordmark" aria-hidden="true">{'Prospect'.split('').map((c, i) => <span key={i}>{c}</span>)}</p>

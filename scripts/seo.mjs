@@ -17,6 +17,10 @@ export const seo = {
     title: 'How to Backtest a Trading Strategy Properly | Prospect',
     description: 'Backtesting trading strategies without fooling yourself: costs, slippage, overfitting and out-of-sample checks, explained for independent traders.'
   },
+  '/systematic-trading/': {
+    title: 'Systematic Trading: A Practical Guide for Traders | Prospect',
+    description: 'What systematic trading is, common strategy types, the research process and pitfalls to avoid. A plain-English guide for independent traders.'
+  },
   '/strategy-monitoring/': {
     title: 'Trading Strategy Monitoring & Drift Detection | Prospect',
     description: 'How to tell when a live trading strategy stops behaving like its backtest: define expectations, watch for drift and know when to review.'

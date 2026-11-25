@@ -81,6 +81,18 @@ try {
   }
   writeFileSync('evidence/browser-results.json', JSON.stringify(results, null, 2));
   assert.equal(results.flatMap(r => r.violations).length, 0, 'Accessibility violations; see evidence/browser-results.json');
+  // Inner pages (guides, product, legal): accessible and no sideways scroll at desktop and phone widths.
+  for (const path of ['/insights/', '/systematic-trading/', '/trading-strategy-backtesting/', '/product/', '/about/', '/privacy/', '/404.html']) {
+    for (const width of [1440, 390]) {
+      const context = await browser.newContext({ viewport: { width, height: 900 } });
+      const page = await context.newPage();
+      await page.goto('http://127.0.0.1:3198' + path);
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${path} ${width}: overflow`);
+      const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze();
+      assert.equal(axe.violations.length, 0, `${path} ${width}: ${axe.violations.map(v => v.id).join(', ')}`);
+      await context.close();
+    }
+  }
   const unavailable = createApp({ origin: 'http://127.0.0.1:3197' });
   await new Promise(resolve => unavailable.listen(3197, '127.0.0.1', resolve));
   try {
