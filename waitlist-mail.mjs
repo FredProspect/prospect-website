@@ -1,13 +1,14 @@
 // Confirmation email delivery through Resend's HTTP API. No SDK dependency: one POST per email.
 
 /** Returns an async `send({ to, subject, html, text })`, or null when email is not configured. */
-export function createResendMailer({ apiKey, from, fetchImpl = fetch } = {}) {
+export function createResendMailer({ apiKey, from, replyTo, fetchImpl = fetch } = {}) {
   if (!apiKey || !from) return null;
   return async ({ to, subject, html, text }) => {
     const response = await fetchImpl('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from, to: [to], subject, html, text }),
+      // A real reply-to address and a plain-text part both help inbox placement.
+      body: JSON.stringify({ from, to: [to], subject, html, text, ...(replyTo ? { reply_to: replyTo } : {}) }),
       signal: AbortSignal.timeout(8000)
     });
     if (!response.ok) throw Error(`Email provider responded ${response.status}`);

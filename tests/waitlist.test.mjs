@@ -179,7 +179,7 @@ test('email confirmation: link confirms once, only confirmed friends count, rese
 
     const confirm = await fetch(app.url + linkFor('member@example.com'), { redirect: 'manual' });
     assert.equal(confirm.status, 303);
-    assert.equal(confirm.headers.get('location'), 'https://prospectpartnership.co.uk/?confirmed=1#waitlist');
+    assert.equal(confirm.headers.get('location'), `https://prospectpartnership.co.uk/?confirmed=1&member=${member.code}`);
     assert.equal((await status(member.code)).confirmed, true);
     const reused = await fetch(app.url + linkFor('member@example.com'), { redirect: 'manual' });
     assert.match(reused.headers.get('location'), /confirmed=invalid/, 'links are single use');

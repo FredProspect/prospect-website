@@ -106,11 +106,16 @@ export const Waitlist = ({ suffix = '' }: { suffix?: string }) => {
   useEffect(() => {
     if (suffix) return;
     const outcome = new URLSearchParams(location.search).get('confirmed');
+    const member = new URLSearchParams(location.search).get('member')?.toUpperCase() ?? '';
+    if (CODE_PATTERN.test(member)) store.set(CODE_KEY, member);
     if (outcome) {
       arrival = outcome === '1' ? 'confirmed' : 'invalid';
       const clean = new URL(location.href);
       clean.searchParams.delete('confirmed');
+      clean.searchParams.delete('member');
       history.replaceState(null, '', clean);
+      // Bring the card into view: it sits in the hero, right at the top.
+      window.scrollTo(0, 0);
     }
     const code = store.get(CODE_KEY);
     if (!code || !CODE_PATTERN.test(code)) return;
@@ -155,6 +160,8 @@ export const Waitlist = ({ suffix = '' }: { suffix?: string }) => {
 
   const busy = status.tone === 'busy';
   return (
+    <>
+    {arrival === 'invalid' && !suffix && <p className="referral-notice" role="status">That confirmation link has expired or was already used. Join again with the same email to get a new one.</p>}
     <form id={id('waitlist-form')} className={`waitlist${status.tone === 'done' ? ' is-done' : ''}`} method="post" action="/api/waitlist" onSubmit={submit} aria-busy={busy || undefined}>
       <label className="sr-only" htmlFor={id('email')}>Email address</label>
       <div className="field">
@@ -172,5 +179,6 @@ export const Waitlist = ({ suffix = '' }: { suffix?: string }) => {
       <div id={id('form-status')} className={`form-status${status.tone === 'error' ? ' error' : ''}`} role="status" aria-live="polite" tabIndex={-1}>{status.message}</div>
       <noscript><p className="fine">JavaScript is required to submit this form. You can <a href={`mailto:${EMAIL}`}>contact the founder</a> for help.</p></noscript>
     </form>
+    </>
   );
 };

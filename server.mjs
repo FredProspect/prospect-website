@@ -81,7 +81,7 @@ export function createApp(config = {}) {
   const allowedOrigins = new Set([origin, ...(additionalOrigin ? [additionalOrigin] : [])]);
   const db = dbPath && secret?.length >= 32 ? openWaitlist(dbPath) : null;
   // Email confirmation switches on only when Resend is configured; until then signups behave as before.
-  const mailer = config.mailer !== undefined ? config.mailer : createResendMailer({ apiKey: process.env.RESEND_API_KEY, from: process.env.MAIL_FROM });
+  const mailer = config.mailer !== undefined ? config.mailer : createResendMailer({ apiKey: process.env.RESEND_API_KEY, from: process.env.MAIL_FROM, replyTo: process.env.MAIL_REPLY_TO });
   const confirmedOnly = Boolean(mailer);
   // Confirmation links point at this collector service, which then returns people to the public site.
   const collectorOrigin = config.collectorOrigin || process.env.COLLECTOR_ORIGIN || additionalOrigin || origin;
@@ -170,14 +170,15 @@ export function createApp(config = {}) {
     }
     if (route === '/api/waitlist/confirm') {
       // Reached from the email link: confirm, then send the person back to the site with the outcome.
-      const back = outcome => { res.writeHead(303, { Location: `${origin}/?confirmed=${outcome}#waitlist`, 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' }); res.end(); };
+      // Carry the member's referral code so their card loads in whichever browser opened the email.
+      const back = (outcome, code) => { res.writeHead(303, { Location: `${origin}/?confirmed=${outcome}${code ? `&member=${code}` : ''}`, 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' }); res.end(); };
       if (!db || req.method !== 'GET') return back('invalid');
       const token = url.searchParams.get('token') || '';
       if (!/^[A-Za-z0-9_-]{43}$/.test(token)) return back('invalid');
-      const row = db.prepare('SELECT email, confirm_sent_at FROM waitlist WHERE confirm_token_hash = ?').get(hashToken(token));
+      const row = db.prepare('SELECT email, referral_code, confirm_sent_at FROM waitlist WHERE confirm_token_hash = ?').get(hashToken(token));
       if (!row || Date.now() - Date.parse(row.confirm_sent_at) > CONFIRM_TTL_MS) return back('invalid');
       db.prepare('UPDATE waitlist SET confirmed_at = ?, confirm_token_hash = NULL WHERE email = ?').run(new Date().toISOString(), row.email);
-      return back('1');
+      return back('1', row.referral_code);
     }
     if (route === '/api/waitlist/resend') {
       if (req.method !== 'POST') return reply(res, 405, { error: 'Use POST.' });
