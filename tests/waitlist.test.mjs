@@ -108,3 +108,48 @@ test('cross-origin collector accepts only configured public sites, including pre
     assert.equal(denied.headers.get('access-control-allow-origin'), null);
   } finally { await app.close(); }
 });
+test('referrals: legacy rows migrate, referrers move up, codes are validated, export is protected', async () => {
+  const folder = mkdtempSync(join(tmpdir(), 'prospect-referral-'));
+  const dbPath = join(folder, 'leads.sqlite');
+  // A database written by the previous release, before referral columns existed.
+  const legacy = new DatabaseSync(dbPath);
+  legacy.exec(`CREATE TABLE waitlist (email TEXT PRIMARY KEY, created_at TEXT NOT NULL, consent_version TEXT NOT NULL, consent_at TEXT NOT NULL, source TEXT);
+    INSERT INTO waitlist VALUES ('early@example.com', '2026-11-01T00:00:00.000Z', 'waitlist-2026-11-16', '2026-11-01T00:00:00.000Z', 'homepage');`);
+  legacy.close();
+  const adminToken = 'admin-token-for-tests-at-least-32-characters';
+  const app = await start({ dbPath, secret, adminToken });
+  const join_ = async (email, ref) => (await (await app.post({ email, consent: true, ...(ref ? { ref } : {}) })).json()).referral;
+  try {
+    const status = code => fetch(`${app.url}/api/waitlist/status?code=${code}`);
+    const late = await join_('late@example.com');
+    assert.match(late.code, /^[A-HJKMNP-Z2-9]{8}$/);
+    assert.equal(late.position, 2, 'joins behind the existing member');
+    assert.equal(late.total, 2);
+    const early = new DatabaseSync(dbPath, { readOnly: true }).prepare('SELECT referral_code FROM waitlist WHERE email = ?').get('early@example.com');
+    assert.match(early.referral_code, /^[A-HJKMNP-Z2-9]{8}$/, 'legacy row received a code');
+
+    const friend = await join_('friend@example.com', late.code.toLowerCase());
+    assert.equal(friend.position, 3);
+    const moved = (await (await status(late.code)).json()).referral;
+    assert.deepEqual([moved.position, moved.referrals], [1, 1], 'one referral moves the referrer to the front');
+
+    await join_('ghost@example.com', 'ZZZZZZZZ');
+    await join_('late@example.com', late.code);
+    assert.equal((await (await status(late.code)).json()).referral.referrals, 1, 'unknown codes and repeat signups do not count');
+    assert.equal((await status('not-a-code')).status, 404);
+
+    assert.equal((await fetch(`${app.url}/api/waitlist/export`)).status, 401);
+    assert.equal((await fetch(`${app.url}/api/waitlist/export`, { headers: { Authorization: 'Bearer wrong' } })).status, 401);
+    const csv = await (await fetch(`${app.url}/api/waitlist/export`, { headers: { Authorization: `Bearer ${adminToken}` } })).text();
+    const lines = csv.trim().split('\n');
+    assert.match(lines[0], /^position,email,referrals/);
+    assert.match(lines[1], /^"1","late@example.com","1"/);
+    assert.equal(lines.length, 5);
+  } finally { await app.close(); rmSync(folder, { recursive: true }); }
+});
+test('export endpoint does not exist without an admin token', async () => {
+  const folder = mkdtempSync(join(tmpdir(), 'prospect-noadmin-'));
+  const app = await start({ dbPath: join(folder, 'leads.sqlite'), secret, adminToken: '' });
+  try { assert.equal((await fetch(`${app.url}/api/waitlist/export`, { headers: { Authorization: 'Bearer anything' } })).status, 404); }
+  finally { await app.close(); rmSync(folder, { recursive: true }); }
+});

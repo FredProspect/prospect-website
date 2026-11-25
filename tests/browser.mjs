@@ -21,6 +21,11 @@ try {
   for (const [width, height, device] of [[1440, 1000, 'desktop'], [390, 844, 'mobile'], [768, 1024, 'tablet'], [320, 740, 'small-mobile']]) {
     // The landing page has one considered dark appearance, so each viewport runs once with reduced motion.
     const context = await browser.newContext({ viewport: { width, height }, reducedMotion: 'reduce' });
+    // The page's collector is the production Railway URL; serve those calls from the local test server.
+    await context.route('https://prospect-public-website-staging.up.railway.app/**', async route => {
+      const response = await route.fetch({ url: route.request().url().replace('https://prospect-public-website-staging.up.railway.app', 'http://127.0.0.1:3198'), headers: { ...route.request().headers(), origin: 'http://127.0.0.1:3198' } });
+      await route.fulfill({ response, headers: { ...response.headers(), 'access-control-allow-origin': 'http://127.0.0.1:3198' } });
+    });
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
@@ -51,7 +56,26 @@ try {
     await page.locator('#email').fill(`${device}@example.com`);
     await page.locator('#consent').check();
     await page.locator('#waitlist-form .submit').click();
-    await page.waitForFunction(() => document.querySelector('#form-status').textContent.startsWith('You’re on the list.'));
+    await page.waitForSelector('.referral-card');
+    const link = await page.locator('.hero .referral-link input').inputValue();
+    assert.match(link, /\?ref=[A-HJKMNP-Z2-9]{8}$/, 'referral link shown after joining');
+    assert.match(await page.locator('.hero .referral-place').textContent(), /#\d+ of \d+/);
+    const referralAxe = await new AxeBuilder({ page }).include('.referral-card').withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze();
+    assert.equal(referralAxe.violations.length, 0, JSON.stringify(referralAxe.violations.map(v => v.id)));
+    // A friend arriving through the link is credited, and the referrer moves up.
+    const friend = await browser.newContext({ viewport: { width, height }, reducedMotion: 'reduce' });
+    const friendPage = await friend.newPage();
+    await friendPage.goto(link.replace('https://prospectpartnership.co.uk', 'http://127.0.0.1:3198'), { waitUntil: 'networkidle' });
+    await friendPage.locator('meta[name=waitlist-endpoint]').evaluate(e => e.content = '/api/waitlist');
+    await friendPage.locator('#email').fill(`friend-${device}@example.com`);
+    await friendPage.locator('#consent').check();
+    await friendPage.locator('#waitlist-form .submit').click();
+    await friendPage.waitForSelector('.referral-card');
+    await friend.close();
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.locator('meta[name=waitlist-endpoint]').evaluate(e => e.content = '/api/waitlist');
+    await page.waitForSelector('.referral-card');
+    assert.match(await page.locator('.hero .referral-copy').textContent(), /referred 1 so far/, 'returning member sees updated standing');
     await context.close();
   }
   writeFileSync('evidence/browser-results.json', JSON.stringify(results, null, 2));

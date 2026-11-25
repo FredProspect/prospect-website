@@ -11,7 +11,7 @@ export const steps: Step[] = [
   { name: 'Manage', title: 'See risk across every strategy.', copy: 'Strategies that look different can share the same exposure. See correlation, concentration and overlap across your whole portfolio in one view.' }
 ];
 
-export const perks = ['Early-access invitations before launch', 'Help shape the product with the founder', 'Launch news only. No spam, no trading credentials'];
+export const perks = ['A chance to be selected as a beta tester', 'Refer friends to move up the list', 'Launch news only. No spam, no trading credentials'];
 
 export const previews = {
   home: { label: 'Your workspace', image: '/assets/product/workspace.jpg', width: 1440, height: 971, alt: 'Prospect prototype home. Create or import a strategy, with no portfolio connected.', title: 'A workspace for what’s next.', copy: 'Start with a strategy idea or bring your existing research. This is a prototype preview, not the released product.' },
@@ -24,5 +24,6 @@ export const faqs: [string, string][] = [
   ['Will Prospect trade for me?', 'No. Prospect is being developed for strategy research and trading intelligence. This website does not offer autonomous trading, brokerage execution or fund management.'],
   ['Do I need to know how to code?', 'The AI-assisted builder aims to make strategy development accessible through natural language. It is still in development; supported workflows and their limitations will be explained at launch.'],
   ['Does backtesting prove a strategy will work?', 'No. Historical tests depend on data quality, costs and assumptions. Overfitting and changing market conditions can make results misleading. Trading can result in losses.'],
-  ['What do I get by joining the waitlist?', 'Emails about Prospect’s launch and early access, and nothing else. We never ask for trading credentials, holdings or financial information, and you can withdraw consent at any time.']
+  ['What do I get by joining the waitlist?', 'Emails about Prospect’s launch and early access, and a chance to be selected as one of our first beta testers. We never ask for trading credentials, holdings or financial information, and you can withdraw consent at any time.'],
+  ['How do referrals work?', 'After joining you get a personal link. Every person who joins the waitlist through it moves you further up the list, and beta invitations go to the top of the list first. Selection is not guaranteed, and the number of beta places is limited.']
 ];

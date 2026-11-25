@@ -134,3 +134,13 @@ Readback of the Railway environment confirmed one replica and the attached priva
 The application collector is deliberately pinned to its tested release; future source pushes alone do not replace it. Deploy future backend updates explicitly, preserve the volume, and verify persistence before publishing dependent static frontend changes. GitHub Pages retains the existing canonical domain; no DNS change was needed.
 
 Remaining verification limits: Firefox/WebKit executables were unavailable; real-user Core Web Vitals, independent screen-reader certification, provider agreement/backup operations and an automated email communication process were not verified or configured by this release. The official company LinkedIn URL still needs an authentic destination; Fred's personal profile remains correctly labelled.
+
+## Referral waitlist (November 2026)
+
+- **Where emails go:** the Railway collector service stores every signup in SQLite at `WAITLIST_DB` (`/var/lib/prospect/waitlist.sqlite`) on its private volume. GitHub Pages only serves the static site; it never sees emails.
+- **Schema:** additive, idempotent migration on start. Adds `referral_code` (unique, 8 unambiguous characters) and `referred_by`, and backfills codes for existing rows. No rows are removed or rewritten.
+- **Ranking:** referrals counted, descending, then signup time, ascending. Only new unique emails joining through a valid code count. Repeat signups, unknown codes and self-referral (impossible: a code exists only after joining) are ignored.
+- **API:** `POST /api/waitlist` accepts an optional `ref` and returns `{ message, referral: { code, position, total, referrals } }`. New and existing emails get an identical reply. `GET /api/waitlist/status?code=` returns the standing (rate-limited, 60 requests per 15 minutes).
+- **Export:** `GET /api/waitlist/export` with `Authorization: Bearer $WAITLIST_ADMIN_TOKEN` returns a ranked CSV. It is disabled (404) unless `WAITLIST_ADMIN_TOKEN` (32+ characters) is set in Railway variables. The shell export `node scripts/export-waitlist.mjs` produces the same CSV.
+- **Deploy order:** the collector is pinned. Deploy this commit to the Railway collector service, keeping the volume attached, then confirm the referral card appears after a test signup. Until then the frontend falls back to the plain "You're on the list" message.
+- **Abuse note:** there is no email verification, so referrals can be inflated with throwaway addresses. Before inviting beta testers, review the referral counts in the export, and consider double opt-in once an email provider is configured.
