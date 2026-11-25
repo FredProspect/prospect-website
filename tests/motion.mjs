@@ -75,7 +75,7 @@ try {
   assert.ok(await noScript.locator('h1').isVisible());
   assert.ok(await noScript.locator('#waitlist-form .submit').isVisible());
   assert.equal(await noScript.locator('.step-card').count(), 5, 'every step is in the markup without scripting');
-  assert.equal(await noScript.locator('.faq details').count(), 5);
+  assert.equal(await noScript.locator('.faq details').count(), 6);
   await noScriptContext.close();
   writeFileSync('evidence/typography-motion.json', JSON.stringify({ results }, null, 2));
   console.log('Typography, smooth scroll, living hero, scroll reveals, previews, reduced motion and no-script fallbacks pass.');

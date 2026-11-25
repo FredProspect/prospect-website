@@ -64,7 +64,7 @@ const Hero = () => {
       <div className="hero-inner wrap">
         <p className="pill reveal"><span className="dot" aria-hidden="true" />Early access · Waitlist now open</p>
         <h1 id="hero-title">AI for{' '}<br />the trader.</h1>
-        <p className="lede reveal">Describe a strategy idea. Prospect is being built to turn it into rules, test it honestly and watch your risk. <strong>Join the waitlist to be first in.</strong></p>
+        <p className="lede reveal">Describe a strategy idea. Prospect is being built to turn it into rules, test it honestly and watch your risk. <strong>Join the waitlist for a chance to be selected as a beta tester, and refer friends to move up the list.</strong></p>
         <div className="reveal hero-form"><Waitlist /><Perks /></div>
       </div>
       <div className="hero-foot wrap reveal">
@@ -261,7 +261,7 @@ const Closing = () => {
           <div className="closing-copy">
             <p className="eyebrow">The waitlist</p>
             <h2>Get in early.</h2>
-            <p>Early members get the first invitations and a direct line to the founder while Prospect takes shape. Free to join. One email address. Nothing else.</p>
+            <p>Waitlist members get a chance to be selected as Prospect’s first beta testers. After you join you’ll get a personal link: every friend who signs up with it moves you up the list.</p>
           </div>
           <div className="closing-form">
             <Waitlist suffix="-end" />
