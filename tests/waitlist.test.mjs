@@ -117,13 +117,14 @@ test('referrals: legacy rows migrate, referrers move up, codes are validated, ex
     INSERT INTO waitlist VALUES ('early@example.com', '2026-11-01T00:00:00.000Z', 'waitlist-2026-11-16', '2026-11-01T00:00:00.000Z', 'homepage');`);
   legacy.close();
   const adminToken = 'admin-token-for-tests-at-least-32-characters';
-  const app = await start({ dbPath, secret, adminToken });
+  const app = await start({ dbPath, secret, adminToken, mailer: null });
   const join_ = async (email, ref) => (await (await app.post({ email, consent: true, ...(ref ? { ref } : {}) })).json()).referral;
   try {
     const status = code => fetch(`${app.url}/api/waitlist/status?code=${code}`);
     const late = await join_('late@example.com');
     assert.match(late.code, /^[A-HJKMNP-Z2-9]{8}$/);
-    assert.deepEqual(Object.keys(late).sort(), ['code', 'referrals', 'tier'], 'no position or list size is exposed');
+    assert.deepEqual(Object.keys(late).sort(), ['code', 'confirmed', 'referrals', 'tier'], 'no position or list size is exposed');
+    assert.equal(late.confirmed, true, 'without email configured everyone counts as confirmed');
     assert.equal(late.tier, 'low');
     const early = new DatabaseSync(dbPath, { readOnly: true }).prepare('SELECT referral_code FROM waitlist WHERE email = ?').get('early@example.com');
     assert.match(early.referral_code, /^[A-HJKMNP-Z2-9]{8}$/, 'legacy row received a code');
@@ -146,8 +147,8 @@ test('referrals: legacy rows migrate, referrers move up, codes are validated, ex
     assert.equal((await fetch(`${app.url}/api/waitlist/export`, { headers: { Authorization: 'Bearer wrong' } })).status, 401);
     const csv = await (await fetch(`${app.url}/api/waitlist/export`, { headers: { Authorization: `Bearer ${adminToken}` } })).text();
     const lines = csv.trim().split('\n');
-    assert.match(lines[0], /^position,email,referrals/);
-    assert.match(lines[1], /^"1","late@example.com","5"/, 'admin export keeps exact ranking');
+    assert.match(lines[0], /^position,email,confirmed_at,referrals/);
+    assert.match(lines[1], /^"1","late@example.com","","5"/, 'admin export keeps exact ranking');
     assert.equal(lines.length, 9);
   } finally { await app.close(); rmSync(folder, { recursive: true }); }
 });
@@ -156,4 +157,46 @@ test('export endpoint does not exist without an admin token', async () => {
   const app = await start({ dbPath: join(folder, 'leads.sqlite'), secret, adminToken: '' });
   try { assert.equal((await fetch(`${app.url}/api/waitlist/export`, { headers: { Authorization: 'Bearer anything' } })).status, 404); }
   finally { await app.close(); rmSync(folder, { recursive: true }); }
+});
+test('email confirmation: link confirms once, only confirmed friends count, resends are throttled', async () => {
+  const folder = mkdtempSync(join(tmpdir(), 'prospect-confirm-'));
+  const sent = [];
+  const app = await start({ dbPath: join(folder, 'leads.sqlite'), secret, mailer: async mail => { sent.push(mail); }, collectorOrigin: 'https://collector.example' });
+  const linkFor = to => sent.filter(mail => mail.to === to).at(-1).text.match(/https:\/\/collector\.example(\S+)/)[1];
+  const status = async code => (await (await fetch(`${app.url}/api/waitlist/status?code=${code}`)).json()).referral;
+  try {
+    const member = (await (await app.post({ email: 'member@example.com', consent: true })).json()).referral;
+    assert.equal(member.confirmed, false);
+    assert.equal(sent.length, 1);
+    assert.match(sent[0].subject, /Confirm/);
+    assert.match(sent[0].html, /Confirm my email/);
+
+    await app.post({ email: 'member@example.com', consent: true });
+    assert.equal(sent.length, 1, 'repeat signup within 10 minutes does not resend');
+    const resend = await fetch(`${app.url}/api/waitlist/resend`, { method: 'POST', headers: { Origin: 'https://prospectpartnership.co.uk', 'Content-Type': 'application/json' }, body: JSON.stringify({ code: member.code }) });
+    assert.equal(resend.status, 200);
+    assert.equal(sent.length, 1, 'resend is throttled too');
+
+    const confirm = await fetch(app.url + linkFor('member@example.com'), { redirect: 'manual' });
+    assert.equal(confirm.status, 303);
+    assert.equal(confirm.headers.get('location'), 'https://prospectpartnership.co.uk/?confirmed=1#waitlist');
+    assert.equal((await status(member.code)).confirmed, true);
+    const reused = await fetch(app.url + linkFor('member@example.com'), { redirect: 'manual' });
+    assert.match(reused.headers.get('location'), /confirmed=invalid/, 'links are single use');
+    assert.match((await fetch(`${app.url}/api/waitlist/confirm?token=nope`, { redirect: 'manual' })).headers.get('location'), /confirmed=invalid/);
+
+    await app.post({ email: 'friend@example.com', consent: true, ref: member.code });
+    assert.equal((await status(member.code)).referrals, 0, 'unconfirmed friends do not count');
+    await fetch(app.url + linkFor('friend@example.com'), { redirect: 'manual' });
+    assert.equal((await status(member.code)).referrals, 1, 'confirmed friend counts');
+  } finally { await app.close(); rmSync(folder, { recursive: true }); }
+});
+test('a failing email provider never blocks a signup', async () => {
+  const folder = mkdtempSync(join(tmpdir(), 'prospect-mailfail-'));
+  const app = await start({ dbPath: join(folder, 'leads.sqlite'), secret, mailer: async () => { throw Error('provider down'); } });
+  try {
+    const res = await app.post({ email: 'someone@example.com', consent: true });
+    assert.equal(res.status, 200);
+    assert.equal((await res.json()).referral.confirmed, false);
+  } finally { await app.close(); rmSync(folder, { recursive: true }); }
 });
