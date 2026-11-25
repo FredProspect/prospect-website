@@ -2,11 +2,11 @@
   {
     "name": "firefox",
     "status": "blocked",
-    "reason": "browserType.launch: Executable doesn't exist at /home/agent/.cache/ms-playwright/firefox-1572/firefox/firefox"
+    "reason": "browserType.launch: Executable doesn't exist at /opt/pw-browsers/firefox-1572/firefox/firefox"
   },
   {
     "name": "webkit",
     "status": "blocked",
-    "reason": "browserType.launch: Executable doesn't exist at /home/agent/.cache/ms-playwright/webkit-2388/pw_run.sh"
+    "reason": "browserType.launch: Executable doesn't exist at /opt/pw-browsers/webkit-2388/pw_run.sh"
   }
 ]

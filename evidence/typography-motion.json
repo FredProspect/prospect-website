@@ -12,11 +12,10 @@
         "body": 17,
         "headline": "600"
       },
-      "architecture": {
-        "inputs": 34,
-        "running": 0,
-        "aiOffset": "0px",
-        "portfolio": "1"
+      "living": {
+        "lenis": true,
+        "canvas": true,
+        "cards": 5
       }
     },
     {
@@ -31,11 +30,10 @@
         "body": 17,
         "headline": "600"
       },
-      "architecture": {
-        "inputs": 34,
-        "running": 0,
-        "aiOffset": "0px",
-        "portfolio": "1"
+      "living": {
+        "lenis": true,
+        "canvas": true,
+        "cards": 5
       }
     }
   ]
