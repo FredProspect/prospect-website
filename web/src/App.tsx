@@ -159,11 +159,25 @@ const HowItWorks = () => {
         }
       } });
       cards.slice(1).forEach((card, i) => {
-        tl.to(card, { yPercent: 0, ease: 'power1.inOut' }, i).to(cards[i], { scale: 0.93, opacity: 0.3, ease: 'power1.inOut' }, i);
+        tl.to(card, { yPercent: 0, ease: 'power1.inOut' }, i).to(cards[i], { scale: 0.93, '--dim': 0.7, ease: 'power1.inOut' }, i);
       });
     });
+    // Phones and tablets: the same layered stack, using sticky cards so it follows native touch scrolling.
     mm.add('(max-width: 899px)', () => {
-      cards.forEach((card, i) => ScrollTrigger.create({ trigger: card, start: 'top 75%', once: true, onEnter: () => visuals[i].play() }));
+      const HEADER = 84;
+      // Each card sticks below the header, or lower if it is too tall to fit, so its whole content is seen.
+      const stickAt = (card: HTMLElement) => Math.min(HEADER, innerHeight - card.offsetHeight - 12);
+      const place = () => cards.forEach(card => card.style.setProperty('--stick', `${stickAt(card)}px`));
+      place();
+      ScrollTrigger.addEventListener('refreshInit', place);
+      cards.forEach((card, i) => {
+        ScrollTrigger.create({ trigger: card, start: 'top 70%', once: true, onEnter: () => visuals[i].play() });
+        const next = cards[i + 1];
+        if (!next) return;
+        // As the next card slides over, this one recedes: smaller, dimmer, pushed back.
+        gsap.to(card, { scale: 0.9, '--dim': 0.7, ease: 'none', scrollTrigger: { trigger: next, start: 'top bottom', end: () => `top ${stickAt(next)}px`, scrub: 0.3, invalidateOnRefresh: true } });
+      });
+      return () => ScrollTrigger.removeEventListener('refreshInit', place);
     });
   });
   return (

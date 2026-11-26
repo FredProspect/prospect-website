@@ -161,7 +161,7 @@ p{margin:0}
   .step-card{position:absolute;inset:0}
   .step-stack{clip-path:inset(-40px -40px 0 -40px)}
 }
-@media (max-width:899px){.steps-pin{grid-template-columns:1fr}.step-rail{display:none}.step-card{grid-template-columns:1fr}}
+@media (max-width:899px){.steps-pin{grid-template-columns:1fr}.step-rail{display:none}.step-stack{gap:28px}.step-card{grid-template-columns:1fr;position:sticky;top:var(--stick,84px);transform-origin:50% 0;will-change:transform,opacity;box-shadow:0 -24px 48px -24px rgba(0,0,0,.75)}}
 
 /* Principles */
 .principles-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
@@ -308,3 +308,7 @@ details[open]::details-content{block-size:auto}
 .confirm-prompt strong{color:var(--ink);font-weight:600}
 .confirm-prompt .referral-reset{margin-top:.5rem;display:inline-block}
 .confirm-note{display:block;margin-top:.3rem;font-size:.875rem;color:var(--ink-3)}
+
+/* Receding step cards darken with an overlay rather than fading, so cards behind never show through. */
+.step-card{isolation:isolate}
+.step-card::after{content:"";position:absolute;inset:-1px;border-radius:inherit;background:#050506;opacity:var(--dim,0);pointer-events:none;z-index:2}
