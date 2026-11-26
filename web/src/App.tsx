@@ -54,7 +54,7 @@ const Hero = () => {
       .from('.hero .reveal', { y: 24, opacity: 0, duration: 1.2, stagger: 0.08 }, 0.55);
     gsap.timeline({ scrollTrigger: { trigger: root, start: 'top top', end: 'bottom top', scrub: true } })
       .to('.hero-inner', { yPercent: -18, opacity: 0, ease: 'none' }, 0)
-      .to('.hero-bg', { scale: 1.18, yPercent: 10, ease: 'none' }, 0);
+      .to('.hero-bg', { yPercent: 12, ease: 'none' }, 0);
   });
   return (
     <section className="hero" ref={ref} aria-labelledby="hero-title">
@@ -83,7 +83,7 @@ const Hero = () => {
 const Manifesto = () => (
   <section className="manifesto wrap" id="manifesto" aria-label="Our principles">
     <p className="eyebrow">Our position</p>
-    <ScrollReveal textClassName="manifesto-text" baseOpacity={0.12} enableBlur blurStrength={6} baseRotation={0} stagger={0.04}>
+    <ScrollReveal textClassName="manifesto-text" baseOpacity={0.12} enableBlur={false} baseRotation={0} stagger={0.04}>
       Retail traders have been sold signals, bots and screenshots. Prospect is being built around process, evidence and risk.
     </ScrollReveal>
   </section>
@@ -151,7 +151,7 @@ const HowItWorks = () => {
       gsap.set(cards.slice(1), { yPercent: 115 });
       ScrollTrigger.create({ trigger: '.steps-pin', start: 'top 70%', once: true, onEnter: () => visuals[0].play() });
       const tl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: {
-        trigger: '.steps-pin', start: 'top top+=96', end: () => `+=${innerHeight * (cards.length - 1) * 0.9}`, pin: true, scrub: 1.2,
+        trigger: '.steps-pin', start: 'top top+=96', end: () => `+=${innerHeight * (cards.length - 1) * 0.9}`, pin: true, scrub: 0.35, anticipatePin: 1,
         onUpdate: self => {
           const index = Math.round(self.progress * (cards.length - 1));
           setCurrent(index);
@@ -250,14 +250,14 @@ const Closing = () => {
   const ref = useRef<HTMLElement>(null);
   useGsap(ref, root => {
     gsap.from('.benefits li', { y: 30, opacity: 0, duration: 1, ease: EASE, stagger: 0.1, scrollTrigger: { trigger: '.benefits', start: 'top 85%' } });
-    gsap.fromTo('.closing-card', { clipPath: 'inset(12% 8% 12% 8% round 40px)' }, { clipPath: 'inset(0% 0% 0% 0% round 28px)', ease: 'none', scrollTrigger: { trigger: root, start: 'top bottom', end: 'top 25%', scrub: true } });
+    gsap.fromTo('.closing-card', { scale: 0.9, opacity: 0.4 }, { scale: 1, opacity: 1, ease: 'none', scrollTrigger: { trigger: root, start: 'top bottom', end: 'top 25%', scrub: true } });
     revealLines(root.querySelector('h2')!, { scrollTrigger: { trigger: root, start: 'top 55%' } });
   });
   return (
     <section id="waitlist" className="closing" ref={ref}>
       <div className="wrap">
         <div className="closing-card">
-          <div className="closing-bg" aria-hidden="true"><DarkVeil color="#1f8f66" speed={0.25} scale={1.3} flow={0.8} brightness={0.85} glow={0.35} grain={0.04} fade={0.3} mouseInteraction={false} /></div>
+          <div className="closing-bg" aria-hidden="true"><DarkVeil dpr={1} quality={0.35} color="#1f8f66" speed={0.25} scale={1.3} flow={0.8} brightness={0.85} glow={0.35} grain={0.04} fade={0.3} mouseInteraction={false} /></div>
           <div className="closing-copy">
             <p className="eyebrow">The waitlist</p>
             <h2>Get in early.</h2>

@@ -29,7 +29,8 @@ export const useSmoothScroll = () => {
   useEffect(() => {
     if (prefersReducedMotion()) return;
     document.documentElement.classList.add('lenis');
-    const lenis = new Lenis({ duration: 1.35, easing: t => 1 - Math.pow(1 - t, 4), smoothWheel: true, wheelMultiplier: 1, touchMultiplier: 1.4, anchors: { offset: -72, duration: 1.8 } });
+    const lenis = // Responsive glide: lerp catches up quickly (no long trailing tail), wheel distance slightly boosted.
+    new Lenis({ lerp: 0.12, smoothWheel: true, wheelMultiplier: 1.15, touchMultiplier: 1.5, anchors: { offset: -72, duration: 1.2 } });
     lenis.on('scroll', ScrollTrigger.update);
     const tick = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(tick);

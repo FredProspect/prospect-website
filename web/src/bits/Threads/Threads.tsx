@@ -394,7 +394,7 @@ const Threads = ({
     const resize = () => {
       const width = Math.max(1, container.clientWidth);
       const height = Math.max(1, container.clientHeight);
-      const baseDpr = Math.min(window.devicePixelRatio || 1, 2);
+      const baseDpr = Math.min(window.devicePixelRatio || 1, 1.25); // soft lines: higher DPR costs frames, adds nothing visible
       const longest = Math.max(width, height) * baseDpr;
       const dpr = longest > MAX_RENDER_DIM ? (baseDpr * MAX_RENDER_DIM) / longest : baseDpr;
       canvas.width = Math.max(1, Math.round(width * dpr));
